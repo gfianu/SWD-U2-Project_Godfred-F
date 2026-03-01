@@ -1,0 +1,112 @@
+/* -------------------------------------------------------
+   Topic Sub Navigation Tabs
+-------------------------------------------------------- */
+
+.topic-subnav {
+  background: #ffffff;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Horizontal tab list */
+.topic-subnav ul {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Tab appearance */
+.topic-subnav a {
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+
+  padding: 8px 16px;
+  border-radius: 8px;
+
+  color: #475569; 
+  background: #f8fafc; 
+  transition: all 0.25s ease;
+}
+
+/* Hover */
+.topic-subnav a:hover {
+  background: #e2e8f0; 
+  color: #1e3a8a;
+}
+
+/* Active tab */
+.topic-subnav a.active {
+  background: #1e3a8a;      
+  color: white !important;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------
+   Mobile Toggle Button
+-------------------------------------------------------- */
+
+.subnav-toggle {
+  all: unset;
+  display: none; 
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  color: #1e3a8a;
+  border-radius: 6px;
+
+  /* center alignment helper (mobile only) */
+  margin: 0 auto;
+}
+
+.subnav-toggle:hover {
+  color: #ffffff;
+}
+
+/* -------------------------------------------------------
+   Mobile Layout 
+-------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .subnav-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .topic-subnav {
+    text-align: center;
+  }
+
+  .topic-subnav ul {
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: #ffffff;
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+
+  .topic-subnav ul.open {
+    display: flex;
+  }
+
+  .topic-subnav a {
+    padding: 0.4rem 0;
+    border-bottom: none;
+  }
+
+  .topic-subnav a.active {
+    font-weight: 600;
+    color: #1e3a8a;
+  }
+}
+

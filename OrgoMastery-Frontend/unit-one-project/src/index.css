@@ -1,0 +1,157 @@
+/* ---------- GLOBAL RESET ---------- */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ---------- GLOBAL COLORS ---------- */
+
+:root {
+  --primary: #2563eb;
+  --primary-light: #dbeafe;
+  --primary-dark: #1e3a8a;
+
+  --bg-light: #f8fafc;
+  --surface: #ffffff;
+
+  --text-dark: #1f2937;
+  --text-muted: #6b7280;
+
+  --success: #16a34a;
+  --danger: #dc2626;
+}
+
+/* ---------- GLOBAL TYPOGRAPHY & BODY STYLES ---------- */
+
+body {
+  font-family: "Inter", "Open Sans", sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  line-height: 1.6;
+  padding: 1rem;
+}
+
+/* ---------- BASIC ELEMENTS ---------- */
+
+h1, h2, h3 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+button:hover {
+    background: var(--primary-dark);
+}
+
+/* ---------- GLOBAL LAYOUT HELPERS ---------- */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.grid {
+    display: grid;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+/* ---------- RESPONSIVE DESIGN (TABLET & MOBILE) ---------- */
+
+@media (max-width: 1024px) {
+    .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    body {
+        padding: 0.5rem;
+    }
+
+    header, footer {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    button {
+        width: 100%;
+    }
+}
+
+/* ---------- INTERACTIVITY & ANIMATION ---------- */
+
+button, .lecture-card, .dashboard-card {
+    transition: all 0.3s ease;
+}
+
+button:hover, .lecture-card:hover, .dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+a:hover {
+    opacity: 0.85;
+}

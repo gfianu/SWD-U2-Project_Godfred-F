@@ -1,0 +1,17 @@
+.note-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.note-links a {
+  text-decoration: none;
+}
+
+.note-item {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--primary-light);
+}

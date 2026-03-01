@@ -1,0 +1,64 @@
+.lecture-dashboard {
+  padding: 1.5rem;
+}
+
+.dashboard-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #1e3a8a;
+}
+
+/* Grid for cards */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Cards */
+.dash-card {
+  background: white;
+  padding: 1.2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.dash-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+
+.dash-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.dash-label {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+/* Last activity text */
+.dash-activity {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+  margin-top: 0.5rem;
+}
+
+/* Quick nav buttons */
+.quick-nav {
+  display: flex;
+  justify-content: center;   
+  align-items: center;       
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+
+.quick-nav button {
+  min-width: 140px;
+}

@@ -1,0 +1,121 @@
+.comments-container {
+  margin-top: 2rem;
+  padding: 1.2rem;
+  background: var(--surface);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.comments-container h3 {
+  margin-bottom: 1rem;
+  color: var(--primary-dark);
+}
+
+/* New Comment Input */
+.comment-input textarea {
+  width: 100%;
+  height: 70px;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  resize: none;
+}
+
+.comment-input button {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+/* Comment List */
+.comments-list {
+  list-style: none;
+  margin-top: 1rem;
+  padding: 0;
+}
+
+.comment-item {
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.comment-text {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.comment-text,
+.comment-actions {
+  margin-left: 2rem;
+}
+
+
+/* Replies */
+.reply-list {
+  list-style: none;
+  margin-left: 1.5rem;
+  margin-top: 0.75rem;
+  padding: 0;
+}
+
+.reply-item {
+  background: #f1f5f9;
+  padding: 0.6rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.reply-text {
+  font-size: 0.9rem;
+}
+
+.reply-btn {
+  background: none;
+  color: var(--primary-dark);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.reply-btn:hover {
+  background: var(--primary-dark);
+  color: white;                  
+}
+
+.delete-btn {
+  background: #dc2626;
+  color: white !important;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+/* Wrapper that makes comments scroll */
+.comments-scroll-area {
+  max-height: 150px;   
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-top: 1rem;
+
+  /* Optional styling */
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.comments-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.comments-scroll-area::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.comments-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

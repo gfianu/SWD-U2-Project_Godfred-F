@@ -1,0 +1,129 @@
+/* ---------- Layout ---------- */
+.quiz-page {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Question number */
+.question-number {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #1e3a8a;
+}
+
+/* ---------- Question Card ---------- */
+.quiz-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; 
+  text-align: left; 
+  background: var(--surface);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.quiz-question {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+/* ---------- Options ---------- */
+.quiz-options {
+  list-style: none;
+  padding: 0;
+}
+
+.quiz-options li {
+  background: var(--surface);
+  border: 1px solid var(--primary-light);
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-bottom: 0.7rem;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.15s;
+}
+
+.quiz-options li:hover {
+  background: var(--primary-light);
+  transform: translateY(-3px);
+}
+
+.quiz-options .selected {
+  background: var(--primary-dark);
+  color: white;
+  border-color: var(--primary-dark);
+  transform: translateY(-3px);
+}
+
+/* ---------- Navigation Buttons ---------- */
+.quiz-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+/* ---------- Results Box ---------- */
+.quiz-result-box {
+  padding: 1.5rem;
+  background-color: var(--surface);
+  border-radius: 12px;
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Review section */
+.review-title {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.review-list {
+  list-style: none;
+  padding: 0;
+}
+
+.review-item {
+  background: #f1f5f9;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.review-question {
+  font-weight: 600;
+}
+
+.review-your-answer {
+  color: #dc2626;
+}
+
+.review-correct {
+  color: #16a34a;
+}
+
+/* ---------- Responsive Design ---------- */
+@media (max-width: 768px) {
+  .quiz-page {
+    padding: 1rem;
+  }
+
+  .quiz-card {
+    padding: 1rem;
+  }
+
+  .quiz-nav {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .quiz-nav button {
+    width: 100%;
+  }
+}

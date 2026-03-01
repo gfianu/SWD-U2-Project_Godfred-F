@@ -1,0 +1,67 @@
+.lecture-list {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.lecture-heading {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+/* Search input */
+.lecture-search {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--primary-light);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: var(--surface);
+}
+
+.lecture-search:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 120, 255, 0.2);
+}
+
+/* Lecture list container */
+.lecture-list-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Card */
+.lecture-list-item {
+  margin-bottom: 1.25rem;
+}
+
+.lecture-card {
+  background: var(--surface);
+  padding: 1.5rem;
+  border-radius: 14px;
+  border: 1px solid var(--primary-light);
+  transition: all 0.25s ease;
+}
+
+.lecture-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+.lecture-card button {
+  margin-top: 1rem;
+}
+
+/* No results message */
+.no-results {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: var(--primary-dark);
+  text-align: center;
+}
+
