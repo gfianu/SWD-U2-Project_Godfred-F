@@ -3,8 +3,8 @@ import { useEffect, useRef } from "react";
 import Button from "../components/Button";
 import "../styles/HomePage.css";
 
-// Import ChemLearn logo
-import ChemLogo from "../assets/ChemLearnLogo.png";
+// Import OrgoMastery logo
+import OrgoMasteryLogo from "../assets/OrgoMasteryLogo.png";
 
 function Home() {
   const logoRef = useRef(null);
@@ -25,8 +25,8 @@ function Home() {
         {/* Logo Image */}
         <img
           ref={logoRef}
-          src={ChemLogo}
-          alt="ChemLearn Logo"
+          src={OrgoMasteryLogo}
+          alt="OrgoMastery Logo"
           className="hero-logo logo-fade"
         />
 

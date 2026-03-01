@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import "../styles/Header.css";
 
 // Import logo
-import ChemLearnLogo from "../assets/ChemLearnLogo.png";
+import OrgoMasteryLogo from "../assets/OrgoMasteryLogo.png";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -14,9 +14,9 @@ export default function Header() {
         {/* Left: Logo */}
         <NavLink to="/" className="header-logo">
           <img
-            src={ChemLearnLogo}
-            alt="ChemLearn Logo"
-            className="chemlearn-logo"
+            src={OrgoMasteryLogo}
+            alt="OrgoMastery Logo"
+            className="orgomastery-logo"
           />
         </NavLink>
 

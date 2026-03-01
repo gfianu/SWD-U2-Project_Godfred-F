@@ -1,12 +1,49 @@
 /* HERO SECTION */
 .start-hero {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 80px 20px;
   text-align: center;
   height: 100vh;
+  overflow: hidden;
+
+  /* Base gradient */
   background: linear-gradient(135deg, #e3f2fd, #ffffff);
+}
+
+/* Glassware Background Layer */
+.start-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image: url("../assets/orgo-glassware-bg.png");
+  background-size: 900px;
+  background-repeat: repeat;
+  background-position: center;
+
+  opacity: 0.50; /* SUBTLE */
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Optional soft overlay for readability */
+.start-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.65);
+  z-index: 0;
+}
+
+/* Ensure content sits above background layers */
+.start-content {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 /* CONTENT WRAPPER */
