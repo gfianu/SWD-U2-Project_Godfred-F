@@ -34,3 +34,5 @@ build/
 
 ### Other ###
 app.env
+
+.DS_Store
