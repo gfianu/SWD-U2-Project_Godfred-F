@@ -1,133 +1,198 @@
+// src/main/java/com/example/orgomastery/config/DataSeeder.java
 package com.example.orgomastery.config;
 
 import com.example.orgomastery.model.*;
 import com.example.orgomastery.repository.LectureRepository;
 import com.example.orgomastery.repository.QuizRepository;
-import org.springframework.boot.CommandLineRunner;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.CommandLineRunner;
+
+import java.io.InputStream;
+import java.util.*;
 
 @Component
 public class DataSeeder implements CommandLineRunner {
 
     private final LectureRepository lectureRepository;
     private final QuizRepository quizRepository;
+    private final ObjectMapper objectMapper;
 
-    public DataSeeder(LectureRepository lectureRepository, QuizRepository quizRepository) {
+    public DataSeeder(LectureRepository lectureRepository, QuizRepository quizRepository, ObjectMapper objectMapper) {
         this.lectureRepository = lectureRepository;
         this.quizRepository = quizRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
+
         // Seed only if empty
-        if (lectureRepository.count() > 0) return;
+        if (lectureRepository.count() > 0) {
+            System.out.println("ℹ️ Seed skipped (lectures already exist).");
+            return;
+        }
 
-        // -------------------------
-        // LECTURE 1
-        // -------------------------
-        Lecture lec1 = new Lecture("A Review of General Chemistry");
-        lec1.setOrderIndex(1);
+        // 1) Load lectures + videos
+        List<LectureSeed> lectureSeeds = readJson("seed/lectures.json", new TypeReference<>() {});
+        Map<String, Lecture> lectureByTitle = new HashMap<>();
 
-        // Videos
-        lec1.addVideo(new LectureVideo(
-                "A Review of General Chemistry_1",
-                "https://drive.google.com/file/d/1-6OqpqQdbuXS3wlNpKbiy5N9t-XMDhhw/view?usp=sharing"
-        ));
-        lec1.getVideos().get(0).setOrderIndex(1);
+        int lectureOrder = 1;
+        for (LectureSeed ls : lectureSeeds) {
+            Lecture lecture = new Lecture(ls.title);
+            lecture.setOrderIndex(lectureOrder++);
 
-        lec1.addVideo(new LectureVideo(
-                "A Review of General Chemistry_2",
-                "https://drive.google.com/file/d/1pWipQ9xGlwn16QU5wE9-SNJAtsf9-Pvc/view?usp=drive_link"
-        ));
-        lec1.getVideos().get(1).setOrderIndex(2);
+            if (ls.videos != null) {
+                int videoOrder = 1;
+                for (VideoSeed vs : ls.videos) {
+                    LectureVideo v = new LectureVideo(vs.name, vs.url);
+                    v.setOrderIndex(videoOrder++);
+                    lecture.addVideo(v);
+                }
+            }
 
-        // Notes
-        LectureNote n1 = new LectureNote(
-                "A Review of General Chemistry_1",
-                "https://drive.google.com/file/d/1mxH3WO52qC3H-ruLGpQNt30zUJfVTAH9/view?usp=sharing",
-                "https://drive.google.com/file/d/1lv55ounkVkxM76LTeCkHedQsiUlIGLVt/view?usp=sharing"
-        );
-        n1.setOrderIndex(1);
-        lec1.addNote(n1);
+            Lecture saved = lectureRepository.save(lecture);
+            lectureByTitle.put(saved.getTitle().trim(), saved);
+        }
 
-        // Save lecture first (cascades videos/notes)
-        lec1 = lectureRepository.save(lec1);
+        // 2) Load notes and attach to lectures
+        List<NotesSeed> notesSeeds = readJson("seed/notes.json", new TypeReference<>() {});
+        for (NotesSeed ns : notesSeeds) {
+            Lecture lecture = lectureByTitle.get(ns.title.trim());
+            if (lecture == null) {
+                System.out.println("⚠️ Notes skipped (no lecture found): " + ns.title);
+                continue;
+            }
 
-        // Quiz 1 (linked to lecture)
-        Quiz q1 = new Quiz(
-                "Gen Chem Foundations — Quiz A",
-                "Check your foundation in key general chemistry ideas that support organic chemistry."
-        );
-        q1.setLecture(lec1);
-        q1.setPublished(true);
+            if (ns.notes != null) {
+                int noteOrder = 1;
+                for (NoteSeed note : ns.notes) {
+                    LectureNote ln = new LectureNote(note.name, note.noteUrl, note.keyUrl);
+                    ln.setOrderIndex(noteOrder++);
+                    lecture.addNote(ln);
+                }
+                lectureRepository.save(lecture);
+            }
+        }
 
-        // Questions
-        Question q1a = new Question(
-                "Which subatomic particles are found in the nucleus of an atom?",
-                "Protons and electrons",
-                "Protons and neutrons",
-                "Neutrons and electrons",
-                "Electrons only",
-                "B"
-        );
-        q1a.setOrderIndex(1);
-        q1.addQuestion(q1a);
+        // 3) Load quizzes + questions (map correct TEXT -> A/B/C/D)
+        List<QuizSeed> quizSeeds = readJson("seed/quizzes.json", new TypeReference<>() {});
 
-        Question q1b = new Question(
-                "Which element is the most electronegative?",
-                "Oxygen",
-                "Fluorine",
-                "Nitrogen",
-                "Chlorine",
-                "B"
-        );
-        q1b.setOrderIndex(2);
-        q1.addQuestion(q1b);
+        for (QuizSeed qs : quizSeeds) {
+            Lecture lecture = lectureByTitle.get(qs.title.trim());
+            if (lecture == null) {
+                System.out.println("⚠️ Quiz skipped (no lecture found): " + qs.title);
+                continue;
+            }
 
-        quizRepository.save(q1);
+            // Support multiple quizzes per lecture: give them unique titles if needed
+            // If your JSON quiz already has a distinct title, you can use qs.quizTitle instead.
+            String quizTitle = qs.topic != null && !qs.topic.isBlank()
+                    ? qs.topic + " — Quiz"
+                    : lecture.getTitle() + " — Quiz";
 
-        // -------------------------
-        // LECTURE 2
-        // -------------------------
-        Lecture lec2 = new Lecture("Molecular Representations");
-        lec2.setOrderIndex(2);
+            Quiz quiz = new Quiz(quizTitle, qs.description);
+            quiz.setLecture(lecture);
+            quiz.setPublished(true);
 
-        lec2.addVideo(new LectureVideo(
-                "Molecular Representations_1",
-                "https://drive.google.com/file/d/15Lzyfp_TZfFI5iFLG7RcGFQHC2H7kPih/view?usp=drive_link"
-        ));
-        lec2.getVideos().get(0).setOrderIndex(1);
+            if (qs.questions != null) {
+                int qOrder = 1;
+                for (QuizQuestionSeed qq : qs.questions) {
+                    if (qq.options == null || qq.options.size() != 4) {
+                        throw new IllegalStateException("Quiz question must have exactly 4 options: " + qq.question);
+                    }
 
-        LectureNote n2 = new LectureNote(
-                "Molecular Representations_1",
-                "https://drive.google.com/file/d/1_1Bm17jFXW-vQhcj20d2Sqqpz84vYg97/view?usp=drive_link",
-                "https://drive.google.com/file/d/1xV8TqMIkqhZz1f9HBJW3oREzlxI0k4U8/view?usp=drive_link"
-        );
-        n2.setOrderIndex(1);
-        lec2.addNote(n2);
+                    String correctChoice = mapCorrectTextToLetter(qq.options, qq.correct);
 
-        lec2 = lectureRepository.save(lec2);
+                    Question q = new Question();
+                    q.setPrompt(qq.question);
+                    q.setChoiceA(qq.options.get(0));
+                    q.setChoiceB(qq.options.get(1));
+                    q.setChoiceC(qq.options.get(2));
+                    q.setChoiceD(qq.options.get(3));
+                    q.setCorrectChoice(correctChoice);
+                    q.setOrderIndex(qOrder++);
+                    q.setQuiz(quiz);
 
-        Quiz q2 = new Quiz(
-                "Molecular Representations — Quiz A",
-                "Practice reading and drawing condensed, Lewis, and line-angle structures."
-        );
-        q2.setLecture(lec2);
-        q2.setPublished(true);
+                    quiz.addQuestion(q); // assumes your Quiz has addQuestion()
+                }
+            }
 
-        Question q2a = new Question(
-                "Which representation shows ALL atoms and bonds explicitly?",
-                "Line-angle formula",
-                "Condensed formula",
-                "Skeletal structure",
-                "Lewis structure",
-                "D"
-        );
-        q2a.setOrderIndex(1);
-        q2.addQuestion(q2a);
+            quizRepository.save(quiz);
+        }
 
-        quizRepository.save(q2);
+        System.out.println("✅ Full seed complete: lectures + videos + notes + quizzes + questions.");
+    }
 
-        System.out.println("✅ Seeded OrgoMastery data (lectures, videos, notes, quizzes, questions).");
+    // ---------- helpers ----------
+
+    private <T> T readJson(String path, TypeReference<T> type) throws Exception {
+        ClassPathResource resource = new ClassPathResource(path);
+        try (InputStream in = resource.getInputStream()) {
+            return objectMapper.readValue(in, type);
+        }
+    }
+
+    private String mapCorrectTextToLetter(List<String> options, String correctText) {
+        if (correctText == null) {
+            throw new IllegalStateException("Correct answer is missing.");
+        }
+
+        int idx = options.indexOf(correctText);
+        if (idx == -1) {
+            throw new IllegalStateException("Correct answer text not found in options. correct=" +
+                    correctText + " options=" + options);
+        }
+
+        return switch (idx) {
+            case 0 -> "A";
+            case 1 -> "B";
+            case 2 -> "C";
+            case 3 -> "D";
+            default -> throw new IllegalStateException("Invalid correct option index: " + idx);
+        };
+    }
+
+    // ---------- Seed POJOs (match JSON structure) ----------
+
+    static class LectureSeed {
+        public int id;
+        public String title;
+        public List<VideoSeed> videos;
+    }
+
+    static class VideoSeed {
+        public int id;
+        public String name;
+        public String url;
+    }
+
+    static class NotesSeed {
+        public int id;
+        public String title;
+        public List<NoteSeed> notes;
+    }
+
+    static class NoteSeed {
+        public int id;
+        public String name;
+        public String noteUrl;
+        public String keyUrl;
+    }
+
+    static class QuizSeed {
+        public int id;
+        public String title;       // lecture title (in your JS this equals lecture title)
+        public String topic;       // optional
+        public String description;
+        public List<QuizQuestionSeed> questions;
+    }
+
+    static class QuizQuestionSeed {
+        public String question;
+        public List<String> options;
+        public String correct;     // correct answer TEXT
     }
 }
