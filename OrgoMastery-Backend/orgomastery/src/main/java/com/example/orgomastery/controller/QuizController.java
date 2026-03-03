@@ -1,23 +1,16 @@
 package com.example.orgomastery.controller;
 
 import com.example.orgomastery.dto.*;
-import com.example.orgomastery.model.Question;
-import com.example.orgomastery.model.Quiz;
-import com.example.orgomastery.repository.QuizRepository;
+import com.example.orgomastery.model.*;
+import com.example.orgomastery.repository.*;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import com.example.orgomastery.repository.QuestionRepository;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/quizzes")
@@ -26,11 +19,16 @@ public class QuizController {
 
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
+    private final QuizAttemptRepository quizAttemptRepository;
 
-    public QuizController(QuizRepository quizRepository, QuestionRepository questionRepository) {
+    public QuizController(QuizRepository quizRepository,
+                          QuestionRepository questionRepository,
+                          QuizAttemptRepository quizAttemptRepository) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
+        this.quizAttemptRepository = quizAttemptRepository;
     }
+
     /**
      * GET /api/quizzes/{quizId}
      * Returns quiz + questions WITHOUT correct answers.
@@ -66,7 +64,7 @@ public class QuizController {
 
     /**
      * POST /api/quizzes/{quizId}/attempts
-     * Submit answers, get score + incorrect review items back.
+     * Submit answers, calculate score, SAVE attempt, return review data.
      */
     @PostMapping("/{quizId}/attempts")
     @Transactional
@@ -74,6 +72,7 @@ public class QuizController {
             @PathVariable Long quizId,
             @Valid @RequestBody AttemptCreateDto body
     ) {
+
         Quiz quiz = quizRepository.findById(quizId).orElse(null);
         if (quiz == null) return ResponseEntity.notFound().build();
 
@@ -87,10 +86,14 @@ public class QuizController {
         int score = 0;
         List<IncorrectAnswerDto> incorrect = new ArrayList<>();
 
+        // Create attempt object (we'll persist after scoring)
+        QuizAttempt attempt = new QuizAttempt();
+        attempt.setQuiz(quiz);
+        attempt.setTotal(total);
+
         for (Question q : quiz.getQuestions()) {
             Integer selectedIndex = selections.get(q.getId());
 
-            // If user didn't answer, count as incorrect but still show review
             String userAnswerText = (selectedIndex == null)
                     ? "No answer"
                     : optionTextByIndex(q, selectedIndex);
@@ -98,6 +101,7 @@ public class QuizController {
             String correctText = optionTextByLetter(q, q.getCorrectChoice());
 
             boolean isCorrect = selectedIndex != null && isCorrect(q, selectedIndex);
+
             if (isCorrect) {
                 score++;
             } else {
@@ -108,21 +112,62 @@ public class QuizController {
                         correctText
                 ));
             }
+
+            // Persist each answer
+            if (selectedIndex != null) {
+                QuizAttemptAnswer answer = new QuizAttemptAnswer();
+                answer.setQuestion(q);
+                answer.setSelectedIndex(selectedIndex);
+                answer.setCorrect(isCorrect);
+                attempt.addAnswer(answer);
+            }
         }
 
-        AttemptResultDto result = new AttemptResultDto(quiz.getId(), score, total, incorrect);
+        attempt.setScore(score);
+
+        // Save attempt + answers (cascade persists answers)
+        quizAttemptRepository.save(attempt);
+
+        AttemptResultDto result =
+                new AttemptResultDto(quiz.getId(), score, total, incorrect);
+
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * GET /api/quizzes/{quizId}/attempts/latest
+     * Returns most recent attempt summary
+     */
+    @GetMapping("/{quizId}/attempts/latest")
+    public ResponseEntity<LatestAttemptDto> getLatestAttempt(@PathVariable Long quizId) {
+
+        return quizAttemptRepository
+                .findTopByQuizIdOrderByCreatedAtDesc(quizId)
+                .map(a -> ResponseEntity.ok(
+                        new LatestAttemptDto(
+                                a.getId(),
+                                a.getQuiz().getId(),
+                                a.getScore(),
+                                a.getTotal(),
+                                a.getCreatedAt()
+                        )
+                ))
+                .orElse(ResponseEntity.noContent().build());
+    }
+
     // ---------- helpers ----------
+
     private boolean isCorrect(Question q, int selectedIndex) {
-        String correct = q.getCorrectChoice(); // "A" / "B" / "C" / "D"
+        String correct = q.getCorrectChoice();
         int correctIndex = switch (correct) {
             case "A" -> 0;
             case "B" -> 1;
             case "C" -> 2;
             case "D" -> 3;
-            default -> throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid correctChoice for question " + q.getId());
+            default -> throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Invalid correctChoice for question " + q.getId()
+            );
         };
         return selectedIndex == correctIndex;
     }
@@ -133,7 +178,10 @@ public class QuizController {
             case 1 -> q.getChoiceB();
             case 2 -> q.getChoiceC();
             case 3 -> q.getChoiceD();
-            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "selectedIndex must be 0-3");
+            default -> throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "selectedIndex must be 0-3"
+            );
         };
     }
 
