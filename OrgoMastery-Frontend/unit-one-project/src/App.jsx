@@ -21,9 +21,6 @@ import LectureDashboard from "./pages/LectureDashboard";
 // Quizzes
 import QuizPage from "./components/QuizPage";
 
-// Data
-import lecturesData from "./data/lecturesData";
-
 function App() {
   return (
     <div id="body-container">
@@ -36,10 +33,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
 
           {/* Lecture list page */}
-          <Route
-            path="/lectures"
-            element={<LectureList lectures={lecturesData} />}
-          />
+          <Route path="/lectures" element={<LectureList />} />
 
           {/* Topic layout with sidebar NavBar */}
           <Route path="/lectures/:id/*" element={<LectureTopicLayout />}>
