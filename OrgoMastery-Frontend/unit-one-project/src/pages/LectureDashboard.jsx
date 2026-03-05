@@ -12,11 +12,10 @@ export default function LectureDashboard() {
   const quizzes = useMemo(() => lecture?.quizzes || [], [lecture?.quizzes]);
   const quizCount = quizzes.length;
 
-  const [attemptsByQuizId, setAttemptsByQuizId] = useState({}); // { [quizId]: attempt | null }
+  const [attemptsByQuizId, setAttemptsByQuizId] = useState({});
   const [attemptsLoading, setAttemptsLoading] = useState(false);
   const [attemptsError, setAttemptsError] = useState("");
 
-  // Load latest attempt for every quiz in this lecture
   useEffect(() => {
     if (!quizzes.length) {
       setAttemptsByQuizId({});
@@ -61,7 +60,6 @@ export default function LectureDashboard() {
         setAttemptsByQuizId(map);
         setAttemptsError(anyError);
       } catch (err) {
-        // Ignore abort errors
         if (err?.name !== "AbortError") {
           setAttemptsError(err?.message || "Failed to load attempts.");
         }
@@ -74,7 +72,6 @@ export default function LectureDashboard() {
     return () => controller.abort();
   }, [quizzes]);
 
-  // Optional: show a “most recent attempt across all quizzes”
   const mostRecentAttempt = useMemo(() => {
     const attempts = Object.values(attemptsByQuizId).filter(Boolean);
     if (!attempts.length) return null;
@@ -86,8 +83,14 @@ export default function LectureDashboard() {
     });
   }, [attemptsByQuizId]);
 
+  //activity + timestamp 
   const lastActivity =
-    localStorage.getItem(`activity_${lecture.id}`) || "No recent activity";
+    localStorage.getItem(`activity_${lecture?.id}`) || "No recent activity";
+  const lastActivityAt = localStorage.getItem(`activityAt_${lecture?.id}`);
+
+  const lastActivityLabel = lastActivityAt
+    ? `${lastActivity} · ${new Date(lastActivityAt).toLocaleString()}`
+    : lastActivity;
 
   return (
     <section className="lecture-dashboard">
@@ -114,7 +117,7 @@ export default function LectureDashboard() {
 
         <div className="dash-card">
           <h3>Last Activity</h3>
-          <p className="dash-activity">{lastActivity}</p>
+          <p className="dash-activity">{lastActivityLabel}</p>
         </div>
 
         <div className="dash-card">
@@ -134,16 +137,11 @@ export default function LectureDashboard() {
         </div>
       </div>
 
-      {/* ---- QUIZ ATTEMPTS LIST ---- */}
       <div style={{ marginTop: "1.5rem" }}>
         <h3 style={{ marginBottom: "0.75rem" }}>Quiz Attempts</h3>
 
         {attemptsLoading && <p className="muted">Loading quiz attempts…</p>}
-
-        {!attemptsLoading && attemptsError && (
-          <p className="muted">{attemptsError}</p>
-        )}
-
+        {!attemptsLoading && attemptsError && <p className="muted">{attemptsError}</p>}
         {!attemptsLoading && quizzes.length === 0 && (
           <p className="muted">No quizzes for this lecture yet.</p>
         )}
@@ -184,10 +182,7 @@ export default function LectureDashboard() {
                   </div>
 
                   <Link to={`/lectures/${lecture.id}/quizzes/${q.id}`}>
-                    <Button
-                      label={attempt ? "Retake" : "Start"}
-                      variant="primary"
-                    />
+                    <Button label={attempt ? "Retake" : "Start"} variant="primary" />
                   </Link>
                 </li>
               );
@@ -196,7 +191,6 @@ export default function LectureDashboard() {
         )}
       </div>
 
-      {/* ---- QUICK NAVIGATION ---- */}
       <div className="quick-nav">
         <Link to={`/lectures/${lecture.id}/videos`}>
           <Button label="Go to Videos" variant="primary" />

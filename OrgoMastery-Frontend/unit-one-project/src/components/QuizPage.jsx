@@ -59,6 +59,10 @@ export default function QuizPage() {
   const selectedIndex =
     currentQuestion ? answers[currentQuestion.id] ?? null : null;
 
+  // Require *all* questions answered before submit (more robust)
+  const allAnswered =
+    questions.length > 0 && questions.every((q) => answers[q.id] !== undefined);
+
   // ---------- navigation ----------
   function handleSelect(idx) {
     if (!currentQuestion) return;
@@ -80,12 +84,13 @@ export default function QuizPage() {
       setSubmitting(true);
       setSubmitError("");
 
-      // Build backend payload: AttemptCreateDto
       const payload = {
-        answers: questions.map((q) => ({
-          questionId: q.id,
-          selectedIndex: answers[q.id] ?? 0, // never null
-        })),
+        answers: questions
+          .filter((q) => answers[q.id] !== undefined)
+          .map((q) => ({
+            questionId: q.id,
+            selectedIndex: answers[q.id],
+          })),
       };
 
       const res = await fetch(`${API_BASE_URL}/api/quizzes/${quiz.id}/attempts`, {
@@ -94,15 +99,13 @@ export default function QuizPage() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        throw new Error(`Submit failed (${res.status})`);
-      }
+      if (!res.ok) throw new Error(`Submit failed (${res.status})`);
 
       const data = await res.json();
       setResult(data);
       setSubmitted(true);
 
-      // Optional: store lecture activity for dashboard "Last Activity"
+      // Store activity consistently by lectureId
       localStorage.setItem(
         `activity_${quiz.lectureId}`,
         `Completed Quiz (${data.score} correct)`
@@ -137,7 +140,10 @@ export default function QuizPage() {
       <section className="quiz-page container">
         <p className="muted">
           {error}{" "}
-          <button onClick={() => window.location.reload()} style={{ marginLeft: "0.5rem" }}>
+          <button
+            onClick={() => window.location.reload()}
+            style={{ marginLeft: "0.5rem" }}
+          >
             Retry
           </button>
         </p>
@@ -205,7 +211,7 @@ export default function QuizPage() {
                 label={submitting ? "Submitting…" : "Submit Quiz"}
                 variant="primary"
                 onClick={handleSubmit}
-                disabled={selectedIndex === null || submitting || questions.length === 0}
+                disabled={!allAnswered || submitting || questions.length === 0}
               />
             ) : (
               <Button
@@ -222,8 +228,7 @@ export default function QuizPage() {
           <h2>Quiz Complete!</h2>
 
           <p>
-            You scored{" "}
-            <strong>{result?.score ?? 0}</strong> out of{" "}
+            You scored <strong>{result?.score ?? 0}</strong> out of{" "}
             <strong>{result?.total ?? questions.length}</strong>.
           </p>
 
@@ -252,7 +257,8 @@ export default function QuizPage() {
           </div>
 
           <div style={{ marginTop: "1rem" }}>
-            <Link to="..">
+            {/* More future-proof than "to=.." if routing changes later */}
+            <Link to={`/lectures/${quiz.lectureId}/quizzes`}>
               <Button label="Back to Quizzes" variant="secondary" />
             </Link>
           </div>

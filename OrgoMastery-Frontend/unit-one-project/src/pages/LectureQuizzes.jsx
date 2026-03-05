@@ -10,10 +10,10 @@ export default function LectureQuizzes() {
   const quizzes = lecture?.quizzes ?? [];
 
   useEffect(() => {
-    if (lecture?.title) {
-      localStorage.setItem(`activity_${lecture.title}`, "Viewed Quizzes");
+    if (lecture?.id) {
+      localStorage.setItem(`activity_${lecture.id}`, "Viewed Quizzes");
     }
-  }, [lecture?.title]);
+  }, [lecture?.id]);
 
   return (
     <section>

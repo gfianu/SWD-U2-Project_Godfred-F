@@ -10,10 +10,10 @@ export default function LectureNotes() {
   const lectureNotes = lecture?.notes ?? [];
 
   useEffect(() => {
-    if (lecture?.title) {
-      localStorage.setItem(`activity_${lecture.title}`, "Viewed Notes");
+    if (lecture?.id) {
+      localStorage.setItem(`activity_${lecture.id}`, "Viewed Notes");
     }
-  }, [lecture?.title]);
+  }, [lecture?.id]);
 
   return (
     <section className="lecture-notes">

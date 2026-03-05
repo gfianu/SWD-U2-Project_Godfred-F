@@ -6,32 +6,37 @@ import "../styles/LectureVideos.css";
 
 export default function LectureVideos() {
   const { lecture } = useOutletContext();
+
   const title = lecture?.title || "Lecture";
   const videos = lecture?.videos ?? [];
 
-  // Track activity
+  // Track lecture activity
   useEffect(() => {
-    if (lecture?.title) {
-      localStorage.setItem(`activity_${lecture.title}`, "Viewed Videos");
+    if (lecture?.id) {
+      localStorage.setItem(`activity_${lecture.id}`, "Viewed Videos");
     }
-  }, [lecture?.title]);
+  }, [lecture?.id]);
 
   return (
-    <section>
+    <section className="lecture-videos">
       <h2>Videos — {title}</h2>
 
       {videos.length === 0 ? (
         <p className="muted">No videos available for this topic yet.</p>
       ) : (
         <ul className="video-list">
-          {videos.map((v) => (
-            <li key={v.id} style={{ marginBottom: "2rem", listStyle: "none" }}>
-              <h3>{v.name}</h3>
+          {videos.map((video) => (
+            <li
+              key={video.id}
+              className="video-item"
+              style={{ marginBottom: "2rem", listStyle: "none" }}
+            >
+              <h3>{video.name}</h3>
 
               <div className="video-wrapper">
                 <iframe
-                  src={convertDriveUrl(v.url)}
-                  title={v.name}
+                  src={convertDriveUrl(video.url)}
+                  title={video.name}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer"
@@ -39,7 +44,10 @@ export default function LectureVideos() {
               </div>
 
               {/* Comments for this video */}
-              <Comments videoId={v.id} lectureTitle={lecture?.title || ""} />
+              <Comments
+                videoId={video.id}
+                lectureTitle={lecture?.title || ""}
+              />
             </li>
           ))}
         </ul>
