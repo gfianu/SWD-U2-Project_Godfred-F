@@ -37,6 +37,7 @@ export default function LectureVideos() {
                 <iframe
                   src={convertDriveUrl(video.url)}
                   title={video.name}
+                  allow="autoplay; encrypted-media"
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer"
