@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams, Link, Outlet } from "react-router-dom";
+import { useParams, Link, Outlet, useNavigate } from "react-router-dom";
 import TopicSubNav from "../components/TopicSubNav";
 import Button from "../components/Button";
 import "../styles/LectureTopicLayout.css";
@@ -7,68 +7,93 @@ import { API_BASE_URL } from "../api/config";
 
 export default function LectureTopicLayout() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
+  const lectureId = useMemo(() => Number(id), [id]);
+  const isValidId = Number.isFinite(lectureId) && lectureId > 0;
 
   const [lecture, setLecture] = useState(null);
-  const [lecturesList, setLecturesList] = useState([]); // for sidebar
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
+  // Sidebar list
+  const [lecturesList, setLecturesList] = useState([]);
+  const [listLoading, setListLoading] = useState(true);
+  const [listError, setListError] = useState("");
+
+  // Detail loading
+  const [detailLoading, setDetailLoading] = useState(true);
+  const [detailError, setDetailError] = useState("");
+
+  // 1) Load sidebar lecture list ONCE
   useEffect(() => {
     let ignore = false;
 
-    async function load() {
+    async function loadList() {
       try {
-        setLoading(true);
-        setError("");
+        setListLoading(true);
+        setListError("");
 
-        const [listRes, detailRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/lectures`),
-          fetch(`${API_BASE_URL}/api/lectures/${id}`),
-        ]);
+        const res = await fetch(`${API_BASE_URL}/api/lectures`);
+        if (!res.ok) throw new Error(`Failed to load lectures (${res.status})`);
 
-        if (!listRes.ok) throw new Error(`Failed to load lectures (${listRes.status})`);
-
-        // If lecture id doesn't exist, treat as not found (no hard error)
-        if (detailRes.status === 404) {
-          const listData = await listRes.json();
-          if (!ignore) {
-            setLecturesList(Array.isArray(listData) ? listData : []);
-            setLecture(null);
-          }
-          return;
-        }
-
-        if (!detailRes.ok) {
-          throw new Error(`Failed to load lecture (${detailRes.status})`);
-        }
-
-        const [listData, detailData] = await Promise.all([
-          listRes.json(),
-          detailRes.json(),
-        ]);
-
-        if (!ignore) {
-          setLecturesList(Array.isArray(listData) ? listData : []);
-          setLecture(detailData);
-        }
+        const data = await res.json();
+        if (!ignore) setLecturesList(Array.isArray(data) ? data : []);
       } catch (err) {
-        if (!ignore) setError(err?.message || "Something went wrong.");
+        if (!ignore) setListError(err?.message || "Failed to load lectures.");
       } finally {
-        if (!ignore) setLoading(false);
+        if (!ignore) setListLoading(false);
       }
     }
 
-    load();
+    loadList();
     return () => {
       ignore = true;
     };
-  }, [id]);
+  }, []);
 
-  const currentLectureId = useMemo(() => Number(id), [id]);
-  const basePath = `/lectures/${currentLectureId}`;
+  // 2) Load lecture detail when id changes
+  useEffect(() => {
+    let ignore = false;
 
-  // Loading
-  if (loading) {
+    async function loadDetail() {
+      if (!isValidId) {
+        setLecture(null);
+        setDetailLoading(false);
+        setDetailError("");
+        return;
+      }
+
+      try {
+        setDetailLoading(true);
+        setDetailError("");
+
+        const res = await fetch(`${API_BASE_URL}/api/lectures/${lectureId}`);
+
+        if (res.status === 404) {
+          if (!ignore) setLecture(null);
+          return;
+        }
+
+        if (!res.ok) throw new Error(`Failed to load lecture (${res.status})`);
+
+        const data = await res.json();
+        if (!ignore) setLecture(data);
+      } catch (err) {
+        if (!ignore) setDetailError(err?.message || "Failed to load lecture.");
+      } finally {
+        if (!ignore) setDetailLoading(false);
+      }
+    }
+
+    loadDetail();
+    return () => {
+      ignore = true;
+    };
+  }, [lectureId, isValidId]);
+
+  const basePath = `/lectures/${lectureId}`;
+
+  // ---- UI states ----
+  if (listLoading || detailLoading) {
     return (
       <section className="container">
         <p className="muted">Loading lecture…</p>
@@ -76,14 +101,14 @@ export default function LectureTopicLayout() {
     );
   }
 
-  // Error
-  if (error) {
+  if (listError || detailError) {
+    const msg = listError || detailError;
     return (
       <section className="container">
         <p className="muted">
-          {error}{" "}
+          {msg}{" "}
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => navigate(0)}
             style={{ marginLeft: "0.5rem" }}
           >
             Retry
@@ -93,7 +118,6 @@ export default function LectureTopicLayout() {
     );
   }
 
-  // Not found
   if (!lecture) {
     return (
       <section className="lecture-not-found container">
@@ -117,9 +141,7 @@ export default function LectureTopicLayout() {
             <li key={lec.id}>
               <Link
                 to={`/lectures/${lec.id}`}
-                className={`sidebar-link ${
-                  lec.id === lecture.id ? "active" : ""
-                }`}
+                className={`sidebar-link ${lec.id === lecture.id ? "active" : ""}`}
               >
                 {lec.title}
               </Link>
@@ -128,7 +150,7 @@ export default function LectureTopicLayout() {
         </ul>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
+      {/* MAIN CONTENT */}
       <section className="lecture-main">
         <header className="lecture-topic-header">
           <h1 className="lecture-title">{lecture.title}</h1>

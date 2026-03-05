@@ -1,25 +1,23 @@
 import { useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import notesData from "../data/notesData";
 import Button from "../components/Button";
 import "../styles/LectureNotes.css";
 
 export default function LectureNotes() {
   const { lecture } = useOutletContext();
 
+  const title = lecture?.title || "Lecture";
+  const lectureNotes = lecture?.notes ?? [];
+
   useEffect(() => {
-    localStorage.setItem(`activity_${lecture.title}`, "Viewed Notes");
-  }, [lecture.title]);
-
-  const match = notesData.find(
-    (entry) => entry.title.trim() === lecture.title.trim()
-  );
-
-  const lectureNotes = match ? match.notes : [];
+    if (lecture?.title) {
+      localStorage.setItem(`activity_${lecture.title}`, "Viewed Notes");
+    }
+  }, [lecture?.title]);
 
   return (
     <section className="lecture-notes">
-      <h2>Notes — {lecture.title}</h2>
+      <h2>Notes — {title}</h2>
 
       {lectureNotes.length === 0 ? (
         <p className="muted">No notes available for this topic yet.</p>
@@ -30,12 +28,12 @@ export default function LectureNotes() {
               <h3>{note.name}</h3>
 
               <div className="note-links">
-
                 {note.noteUrl ? (
                   <a
                     href={note.noteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    referrerPolicy="no-referrer"
                   >
                     <Button label="View Notes" variant="primary" />
                   </a>
@@ -48,13 +46,13 @@ export default function LectureNotes() {
                     href={note.keyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    referrerPolicy="no-referrer"
                   >
                     <Button label="View Key" variant="secondary" />
                   </a>
                 ) : (
                   <span className="muted">(No key available)</span>
                 )}
-
               </div>
             </li>
           ))}

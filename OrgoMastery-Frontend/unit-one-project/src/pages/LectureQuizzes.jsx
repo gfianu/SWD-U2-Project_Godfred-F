@@ -1,19 +1,29 @@
-import { useOutletContext, Link } from "react-router-dom";
-import quizzesData from "../data/quizzesData";
+import { useEffect } from "react";
+import { Link, useOutletContext } from "react-router-dom";
 import Button from "../components/Button";
 
 export default function LectureQuizzes() {
   const { lecture } = useOutletContext();
 
-  const filtered = quizzesData.filter((q) => q.title === lecture.title);
+  const title = lecture?.title || "Lecture";
+  // From backend: lecture.quizzes is an array of QuizSummaryDto
+  const quizzes = lecture?.quizzes ?? [];
+
+  useEffect(() => {
+    if (lecture?.title) {
+      localStorage.setItem(`activity_${lecture.title}`, "Viewed Quizzes");
+    }
+  }, [lecture?.title]);
 
   return (
     <section>
-      {filtered.length === 0 ? (
+      <h2>Quizzes — {title}</h2>
+
+      {quizzes.length === 0 ? (
         <p className="muted">No quizzes available for this lecture yet.</p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {filtered.map((q) => (
+        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          {quizzes.map((q) => (
             <li
               key={q.id}
               style={{
@@ -23,10 +33,7 @@ export default function LectureQuizzes() {
               }}
             >
               <Link to={`${q.id}`}>
-                <Button
-                  label={`Take Quiz for ${lecture.title}`}
-                  variant="primary"
-                />
+                <Button label={`Take ${q.title}`} variant="primary" />
               </Link>
             </li>
           ))}

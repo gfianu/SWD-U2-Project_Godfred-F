@@ -1,25 +1,93 @@
-import { useOutletContext } from "react-router-dom";
-import notesData from "../data/notesData";
-import quizzesData from "../data/quizzesData";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useOutletContext } from "react-router-dom";
 import Button from "../components/Button";
 import "../styles/LectureDashboard.css";
+import { API_BASE_URL } from "../api/config";
 
 export default function LectureDashboard() {
   const { lecture } = useOutletContext();
 
-  const notesEntry = notesData.find((n) => n.title === lecture.title);
-  const notesCount = notesEntry ? notesEntry.notes.length : 0;
+  const videoCount = lecture?.videos?.length || 0;
+  const notesCount = lecture?.notes?.length || 0;
+  const quizzes = useMemo(() => lecture?.quizzes || [], [lecture?.quizzes]);
+  const quizCount = quizzes.length;
 
-  const relatedQuizzes = quizzesData.filter((q) => q.title === lecture.title);
-  const quizCount = relatedQuizzes.length;
+  const [attemptsByQuizId, setAttemptsByQuizId] = useState({}); // { [quizId]: attempt | null }
+  const [attemptsLoading, setAttemptsLoading] = useState(false);
+  const [attemptsError, setAttemptsError] = useState("");
 
-  const videoCount = lecture.videos ? lecture.videos.length : 0;
+  // Load latest attempt for every quiz in this lecture
+  useEffect(() => {
+    if (!quizzes.length) {
+      setAttemptsByQuizId({});
+      setAttemptsError("");
+      setAttemptsLoading(false);
+      return;
+    }
 
-  const lastQuizScore =
-    localStorage.getItem(`quizScore_${lecture.title}`) || "No recent quiz";
+    const controller = new AbortController();
+
+    async function loadLatestAttempts() {
+      try {
+        setAttemptsLoading(true);
+        setAttemptsError("");
+
+        const results = await Promise.allSettled(
+          quizzes.map(async (q) => {
+            const res = await fetch(
+              `${API_BASE_URL}/api/quizzes/${q.id}/attempts/latest`,
+              { signal: controller.signal }
+            );
+
+            if (res.status === 204) return { quizId: q.id, attempt: null };
+            if (!res.ok) throw new Error(`Quiz ${q.id}: failed (${res.status})`);
+
+            const attempt = await res.json();
+            return { quizId: q.id, attempt };
+          })
+        );
+
+        const map = {};
+        let anyError = "";
+
+        for (const r of results) {
+          if (r.status === "fulfilled") {
+            map[r.value.quizId] = r.value.attempt;
+          } else if (!anyError) {
+            anyError = r.reason?.message || "Failed to load";
+          }
+        }
+
+        setAttemptsByQuizId(map);
+        setAttemptsError(anyError);
+      } catch (err) {
+        // Ignore abort errors
+        if (err?.name !== "AbortError") {
+          setAttemptsError(err?.message || "Failed to load attempts.");
+        }
+      } finally {
+        setAttemptsLoading(false);
+      }
+    }
+
+    loadLatestAttempts();
+    return () => controller.abort();
+  }, [quizzes]);
+
+  // Optional: show a “most recent attempt across all quizzes”
+  const mostRecentAttempt = useMemo(() => {
+    const attempts = Object.values(attemptsByQuizId).filter(Boolean);
+    if (!attempts.length) return null;
+
+    return attempts.reduce((latest, cur) => {
+      const a = new Date(latest.createdAt).getTime();
+      const b = new Date(cur.createdAt).getTime();
+      return b > a ? cur : latest;
+    });
+  }, [attemptsByQuizId]);
 
   const lastActivity =
-    localStorage.getItem(`activity_${lecture.title}`) || "No recent activity";
+    localStorage.getItem(`activity_${lecture.id}`) || "No recent activity";
 
   return (
     <section className="lecture-dashboard">
@@ -45,36 +113,102 @@ export default function LectureDashboard() {
         </div>
 
         <div className="dash-card">
-          <h3>Last Quiz Score</h3>
-          <p className="dash-number">{lastQuizScore}</p>
-          <p className="dash-label">Most recent attempt</p>
-        </div>
-
-        <div className="dash-card">
           <h3>Last Activity</h3>
           <p className="dash-activity">{lastActivity}</p>
         </div>
+
+        <div className="dash-card">
+          <h3>Most Recent Quiz Attempt</h3>
+          {mostRecentAttempt ? (
+            <>
+              <p className="dash-number">
+                {mostRecentAttempt.score}/{mostRecentAttempt.total}
+              </p>
+              <p className="dash-label">
+                {new Date(mostRecentAttempt.createdAt).toLocaleString()}
+              </p>
+            </>
+          ) : (
+            <p className="dash-label">No attempts yet</p>
+          )}
+        </div>
+      </div>
+
+      {/* ---- QUIZ ATTEMPTS LIST ---- */}
+      <div style={{ marginTop: "1.5rem" }}>
+        <h3 style={{ marginBottom: "0.75rem" }}>Quiz Attempts</h3>
+
+        {attemptsLoading && <p className="muted">Loading quiz attempts…</p>}
+
+        {!attemptsLoading && attemptsError && (
+          <p className="muted">{attemptsError}</p>
+        )}
+
+        {!attemptsLoading && quizzes.length === 0 && (
+          <p className="muted">No quizzes for this lecture yet.</p>
+        )}
+
+        {!attemptsLoading && quizzes.length > 0 && (
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {quizzes.map((q) => {
+              const attempt = attemptsByQuizId[q.id];
+
+              return (
+                <li
+                  key={q.id}
+                  style={{
+                    padding: "0.75rem 0",
+                    borderBottom: "1px solid rgba(255,255,255,0.08)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "1rem",
+                  }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, marginBottom: "0.25rem" }}>
+                      {q.title}
+                    </div>
+
+                    {attempt === undefined ? (
+                      <div className="muted">Error loading attempt</div>
+                    ) : attempt === null ? (
+                      <div className="muted">No attempts yet</div>
+                    ) : (
+                      <div className="muted">
+                        Latest: <strong>{attempt.score}</strong>/
+                        <strong>{attempt.total}</strong> ·{" "}
+                        {new Date(attempt.createdAt).toLocaleString()}
+                      </div>
+                    )}
+                  </div>
+
+                  <Link to={`/lectures/${lecture.id}/quizzes/${q.id}`}>
+                    <Button
+                      label={attempt ? "Retake" : "Start"}
+                      variant="primary"
+                    />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
 
       {/* ---- QUICK NAVIGATION ---- */}
       <div className="quick-nav">
-        <Button
-          label="Go to Videos"
-          variant="primary"
-          onClick={() => (window.location.href = `/lectures/${lecture.id}/videos`)}
-        />
+        <Link to={`/lectures/${lecture.id}/videos`}>
+          <Button label="Go to Videos" variant="primary" />
+        </Link>
 
-        <Button
-          label="Go to Notes"
-          variant="secondary"
-          onClick={() => (window.location.href = `/lectures/${lecture.id}/notes`)}
-        />
+        <Link to={`/lectures/${lecture.id}/notes`}>
+          <Button label="Go to Notes" variant="secondary" />
+        </Link>
 
-        <Button
-          label="Go to Quizzes"
-          variant="primary"
-          onClick={() => (window.location.href = `/lectures/${lecture.id}/quizzes`)}
-        />
+        <Link to={`/lectures/${lecture.id}/quizzes`}>
+          <Button label="Go to Quizzes" variant="primary" />
+        </Link>
       </div>
     </section>
   );
