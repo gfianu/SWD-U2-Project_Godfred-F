@@ -1,18 +1,31 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/Header.css";
+import { useAuth } from "../context/AuthContext";
 
 // Import logo
 import OrgoMasteryLogo from "../assets/OrgoMasteryLogo.png";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const { user, isAuthenticated, logout, isInstructor } = useAuth();
+
+  function closeMenu() {
+    setMenuOpen(false);
+  }
+
+  function handleLogout() {
+    logout();
+    closeMenu();
+    navigate("/");
+  }
 
   return (
     <header className="header">
       <div className="header-inner">
-        {/* Left: Logo */}
-        <NavLink to="/" className="header-logo">
+        <NavLink to="/" className="header-logo" onClick={closeMenu}>
           <img
             src={OrgoMasteryLogo}
             alt="OrgoMastery Logo"
@@ -20,25 +33,60 @@ export default function Header() {
           />
         </NavLink>
 
-        {/* Hamburger (mobile only) */}
         <button
           className="hamburger"
-          onClick={() => setMenuOpen(!menuOpen)}
+          onClick={() => setMenuOpen((prev) => !prev)}
           aria-label="Toggle menu"
+          aria-expanded={menuOpen}
         >
           &#9776;
         </button>
 
-        {/* Right: Navigation */}
         <nav className={`header-nav ${menuOpen ? "open" : ""}`}>
-          <NavLink to="/" end>
+          <NavLink to="/" end onClick={closeMenu}>
             Home
           </NavLink>
-          <NavLink to="/about">About</NavLink>
-          <NavLink to="/contact">Contact</NavLink>
+          <NavLink to="/about" onClick={closeMenu}>
+            About
+          </NavLink>
+          <NavLink to="/contact" onClick={closeMenu}>
+            Contact
+          </NavLink>
+          <NavLink to="/lectures" onClick={closeMenu}>
+            Lectures
+          </NavLink>
+
+          {isAuthenticated && isInstructor && (
+            <NavLink to="/instructor" onClick={closeMenu}>
+              Instructor
+            </NavLink>
+          )}
+
+          {!isAuthenticated ? (
+            <>
+              <NavLink to="/login" onClick={closeMenu}>
+                Login
+              </NavLink>
+              <NavLink to="/register" onClick={closeMenu}>
+                Register
+              </NavLink>
+            </>
+          ) : (
+            <>
+              <span className="header-user">
+                {user?.username} {user?.role ? `(${user.role})` : ""}
+              </span>
+              <button
+                type="button"
+                className="logout-btn"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </>
+          )}
         </nav>
       </div>
     </header>
   );
 }
-

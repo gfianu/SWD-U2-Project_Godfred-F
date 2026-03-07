@@ -1,5 +1,5 @@
 .orgomastery-logo {
-  height: 60px;     
+  height: 60px;
   width: auto;
   display: block;
 }
@@ -38,7 +38,8 @@
 
 .header-nav {
   display: flex;
-  gap: 2rem;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .header-nav a {
@@ -69,17 +70,45 @@
 }
 
 /* ------------------------------ */
-/* Hamburger Icon (Hidden on Desktop) */
+/* Auth display                   */
 /* ------------------------------ */
 
-/* Prevent global button styles from affecting hamburger */
+.header-user {
+  color: #333;
+  font-size: 0.98rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  all: unset;
+  cursor: pointer;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #f3f7fb;
+  border-color: #b7c7db;
+}
+
+/* ------------------------------ */
+/* Hamburger Icon                 */
+/* ------------------------------ */
+
 .hamburger {
-  all: unset;                 
+  all: unset;
   font-size: 1.8rem;
   cursor: pointer;
   line-height: 1;
   padding: 0.4rem 0.6rem;
-  display: none;         /* hidden on desktop */
+  display: none;
 }
 
 .hamburger:hover {
@@ -101,14 +130,16 @@
     position: absolute;
     top: 70px;
     right: 0;
-    width: 220px;
+    width: 240px;
     padding: 1rem;
     background: white;
     border-left: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 1rem;
 
     transform: translateX(100%);
@@ -117,6 +148,16 @@
 
   .header-nav.open {
     transform: translateX(0%);
+  }
+
+  .header-user {
+    font-size: 0.95rem;
+    white-space: normal;
+  }
+
+  .logout-btn {
+    width: 100%;
+    text-align: center;
   }
 }
 
