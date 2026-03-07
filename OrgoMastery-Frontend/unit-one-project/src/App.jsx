@@ -1,25 +1,27 @@
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 
-// Persistent layout
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-// Static pages
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import InstructorDashboard from "./pages/InstructorDashboard";
 
-// Lecture system
 import LectureList from "./components/LectureList";
 import LectureTopicLayout from "./pages/LectureTopicLayout";
 import LectureNotes from "./pages/LectureNotes";
 import LectureVideos from "./pages/LectureVideos";
 import LectureQuizzes from "./pages/LectureQuizzes";
 import LectureDashboard from "./pages/LectureDashboard";
-
-// Quizzes
 import QuizPage from "./components/QuizPage";
+
+import InstructorLectureManager from "./pages/InstructorLectureManager";
+import InstructorQuestionManager from "./pages/InstructorQuestionManager";
 
 function App() {
   return (
@@ -27,28 +29,50 @@ function App() {
       <Header />
       <main>
         <Routes>
-          {/* Landing pages */}
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
 
-          {/* Lecture list page */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
           <Route path="/lectures" element={<LectureList />} />
 
-          {/* Topic layout with sidebar NavBar */}
           <Route path="/lectures/:id/*" element={<LectureTopicLayout />}>
-            <Route index element={<LectureVideos />} /> {/* default = videos */}
+            <Route index element={<LectureVideos />} />
             <Route path="notes" element={<LectureNotes />} />
             <Route path="videos" element={<LectureVideos />} />
             <Route path="quizzes" element={<LectureQuizzes />} />
-            {/* nested quiz route */}
-            <Route
-              path="quizzes/:quizId"
-              element={<QuizPage />}
-            />
+            <Route path="quizzes/:quizId" element={<QuizPage />} />
             <Route path="dashboard" element={<LectureDashboard />} />
           </Route>
 
+          <Route
+            path="/instructor"
+            element={
+              <ProtectedRoute requireInstructor={true}>
+                <InstructorDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/instructor/lectures"
+            element={
+              <ProtectedRoute requireInstructor={true}>
+                <InstructorLectureManager />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/instructor/questions"
+            element={
+              <ProtectedRoute requireInstructor={true}>
+                <InstructorQuestionManager />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
 
