@@ -44,7 +44,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/lectures/**", "/api/quizzes/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/quizzes/*/attempts").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/comments").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/comments/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/questions/**").hasRole("INSTRUCTOR")
                         .requestMatchers(HttpMethod.PUT, "/api/questions/**").hasRole("INSTRUCTOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/questions/**").hasRole("INSTRUCTOR")
