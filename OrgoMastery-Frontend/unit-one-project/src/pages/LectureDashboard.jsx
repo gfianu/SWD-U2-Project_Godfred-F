@@ -3,9 +3,11 @@ import { Link, useOutletContext } from "react-router-dom";
 import Button from "../components/Button";
 import "../styles/LectureDashboard.css";
 import { API_BASE_URL } from "../api/config";
+import { useAuth } from "../context/AuthContext";
 
 export default function LectureDashboard() {
   const { lecture } = useOutletContext();
+  const { token, isAuthenticated } = useAuth();
 
   const videoCount = lecture?.videos?.length || 0;
   const notesCount = lecture?.notes?.length || 0;
@@ -17,6 +19,13 @@ export default function LectureDashboard() {
   const [attemptsError, setAttemptsError] = useState("");
 
   useEffect(() => {
+    if (!isAuthenticated || !token) {
+      setAttemptsByQuizId({});
+      setAttemptsError("");
+      setAttemptsLoading(false);
+      return;
+    }
+
     if (!quizzes.length) {
       setAttemptsByQuizId({});
       setAttemptsError("");
@@ -35,10 +44,18 @@ export default function LectureDashboard() {
           quizzes.map(async (q) => {
             const res = await fetch(
               `${API_BASE_URL}/api/quizzes/${q.id}/attempts/latest`,
-              { signal: controller.signal }
+              {
+                signal: controller.signal,
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
             );
 
             if (res.status === 204) return { quizId: q.id, attempt: null };
+            if (res.status === 401) {
+              throw new Error("Please log in to view your quiz attempts.");
+            }
             if (!res.ok) throw new Error(`Quiz ${q.id}: failed (${res.status})`);
 
             const attempt = await res.json();
@@ -70,7 +87,7 @@ export default function LectureDashboard() {
 
     loadLatestAttempts();
     return () => controller.abort();
-  }, [quizzes]);
+  }, [quizzes, isAuthenticated, token]);
 
   const mostRecentAttempt = useMemo(() => {
     const attempts = Object.values(attemptsByQuizId).filter(Boolean);
@@ -83,7 +100,6 @@ export default function LectureDashboard() {
     });
   }, [attemptsByQuizId]);
 
-  //activity + timestamp 
   const lastActivity =
     localStorage.getItem(`activity_${lecture?.id}`) || "No recent activity";
   const lastActivityAt = localStorage.getItem(`activityAt_${lecture?.id}`);
@@ -122,7 +138,11 @@ export default function LectureDashboard() {
 
         <div className="dash-card">
           <h3>Most Recent Quiz Attempt</h3>
-          {mostRecentAttempt ? (
+          {!isAuthenticated ? (
+            <p className="dash-label">
+              <Link to="/login">Log in</Link> to view your attempts
+            </p>
+          ) : mostRecentAttempt ? (
             <>
               <p className="dash-number">
                 {mostRecentAttempt.score}/{mostRecentAttempt.total}
@@ -140,54 +160,67 @@ export default function LectureDashboard() {
       <div style={{ marginTop: "1.5rem" }}>
         <h3 style={{ marginBottom: "0.75rem" }}>Quiz Attempts</h3>
 
-        {attemptsLoading && <p className="muted">Loading quiz attempts…</p>}
-        {!attemptsLoading && attemptsError && <p className="muted">{attemptsError}</p>}
-        {!attemptsLoading && quizzes.length === 0 && (
-          <p className="muted">No quizzes for this lecture yet.</p>
-        )}
+        {!isAuthenticated ? (
+          <p className="muted">
+            Please <Link to="/login">log in</Link> to view your quiz attempts.
+          </p>
+        ) : (
+          <>
+            {attemptsLoading && <p className="muted">Loading quiz attempts…</p>}
+            {!attemptsLoading && attemptsError && (
+              <p className="muted">{attemptsError}</p>
+            )}
+            {!attemptsLoading && quizzes.length === 0 && (
+              <p className="muted">No quizzes for this lecture yet.</p>
+            )}
 
-        {!attemptsLoading && quizzes.length > 0 && (
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-            {quizzes.map((q) => {
-              const attempt = attemptsByQuizId[q.id];
+            {!attemptsLoading && quizzes.length > 0 && (
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                {quizzes.map((q) => {
+                  const attempt = attemptsByQuizId[q.id];
 
-              return (
-                <li
-                  key={q.id}
-                  style={{
-                    padding: "0.75rem 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.08)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "1rem",
-                  }}
-                >
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, marginBottom: "0.25rem" }}>
-                      {q.title}
-                    </div>
+                  return (
+                    <li
+                      key={q.id}
+                      style={{
+                        padding: "0.75rem 0",
+                        borderBottom: "1px solid rgba(255,255,255,0.08)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "1rem",
+                      }}
+                    >
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, marginBottom: "0.25rem" }}>
+                          {q.title}
+                        </div>
 
-                    {attempt === undefined ? (
-                      <div className="muted">Error loading attempt</div>
-                    ) : attempt === null ? (
-                      <div className="muted">No attempts yet</div>
-                    ) : (
-                      <div className="muted">
-                        Latest: <strong>{attempt.score}</strong>/
-                        <strong>{attempt.total}</strong> ·{" "}
-                        {new Date(attempt.createdAt).toLocaleString()}
+                        {attempt === undefined ? (
+                          <div className="muted">Error loading attempt</div>
+                        ) : attempt === null ? (
+                          <div className="muted">No attempts yet</div>
+                        ) : (
+                          <div className="muted">
+                            Latest: <strong>{attempt.score}</strong>/
+                            <strong>{attempt.total}</strong> ·{" "}
+                            {new Date(attempt.createdAt).toLocaleString()}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
 
-                  <Link to={`/lectures/${lecture.id}/quizzes/${q.id}`}>
-                    <Button label={attempt ? "Retake" : "Start"} variant="primary" />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+                      <Link to={`/lectures/${lecture.id}/quizzes/${q.id}`}>
+                        <Button
+                          label={attempt ? "Retake" : "Start"}
+                          variant="primary"
+                        />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
         )}
       </div>
 
@@ -207,4 +240,3 @@ export default function LectureDashboard() {
     </section>
   );
 }
-

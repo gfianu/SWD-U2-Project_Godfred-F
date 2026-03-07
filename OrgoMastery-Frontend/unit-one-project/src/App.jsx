@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import InstructorDashboard from "./pages/InstructorDashboard";
+import MyProgress from "./pages/MyProgress";
 
 import LectureList from "./components/LectureList";
 import LectureTopicLayout from "./pages/LectureTopicLayout";
@@ -46,6 +47,15 @@ function App() {
             <Route path="quizzes/:quizId" element={<QuizPage />} />
             <Route path="dashboard" element={<LectureDashboard />} />
           </Route>
+
+          <Route
+            path="/progress"
+            element={
+              <ProtectedRoute>
+                <MyProgress />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/instructor"

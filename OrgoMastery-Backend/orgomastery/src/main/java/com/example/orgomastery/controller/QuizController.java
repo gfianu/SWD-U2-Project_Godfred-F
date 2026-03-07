@@ -1,11 +1,19 @@
 package com.example.orgomastery.controller;
 
 import com.example.orgomastery.dto.*;
-import com.example.orgomastery.model.*;
-import com.example.orgomastery.repository.*;
+import com.example.orgomastery.model.Question;
+import com.example.orgomastery.model.Quiz;
+import com.example.orgomastery.model.QuizAttempt;
+import com.example.orgomastery.model.QuizAttemptAnswer;
+import com.example.orgomastery.model.User;
+import com.example.orgomastery.repository.QuestionRepository;
+import com.example.orgomastery.repository.QuizAttemptRepository;
+import com.example.orgomastery.repository.QuizRepository;
+import com.example.orgomastery.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,23 +28,23 @@ public class QuizController {
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
     private final QuizAttemptRepository quizAttemptRepository;
+    private final UserRepository userRepository;
 
-    public QuizController(QuizRepository quizRepository,
-                          QuestionRepository questionRepository,
-                          QuizAttemptRepository quizAttemptRepository) {
+    public QuizController(
+            QuizRepository quizRepository,
+            QuestionRepository questionRepository,
+            QuizAttemptRepository quizAttemptRepository,
+            UserRepository userRepository
+    ) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
         this.quizAttemptRepository = quizAttemptRepository;
+        this.userRepository = userRepository;
     }
 
-    /**
-     * GET /api/quizzes/{quizId}
-     * Returns quiz + questions WITHOUT correct answers.
-     */
     @GetMapping("/{quizId}")
     @Transactional(readOnly = true)
     public ResponseEntity<QuizDetailDto> getQuiz(@PathVariable Long quizId) {
-
         Quiz quiz = quizRepository.findById(quizId).orElse(null);
         if (quiz == null) return ResponseEntity.notFound().build();
 
@@ -62,21 +70,25 @@ public class QuizController {
         return ResponseEntity.ok(dto);
     }
 
-    /**
-     * POST /api/quizzes/{quizId}/attempts
-     * Submit answers, calculate score, SAVE attempt, return review data.
-     */
     @PostMapping("/{quizId}/attempts")
     @Transactional
-    public ResponseEntity<AttemptResultDto> submitAttempt(
+    public ResponseEntity<?> submitAttempt(
             @PathVariable Long quizId,
-            @Valid @RequestBody AttemptCreateDto body
+            @Valid @RequestBody AttemptCreateDto body,
+            Authentication authentication
     ) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        User user = userRepository.findByEmail(authentication.getName()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
 
         Quiz quiz = quizRepository.findById(quizId).orElse(null);
         if (quiz == null) return ResponseEntity.notFound().build();
 
-        // Map: questionId -> selectedIndex
         Map<Long, Integer> selections = new HashMap<>();
         for (AttemptAnswerDto a : body.getAnswers()) {
             selections.put(a.getQuestionId(), a.getSelectedIndex());
@@ -86,9 +98,10 @@ public class QuizController {
         int score = 0;
         List<IncorrectAnswerDto> incorrect = new ArrayList<>();
 
-        // Create attempt object (we'll persist after scoring)
         QuizAttempt attempt = new QuizAttempt();
         attempt.setQuiz(quiz);
+        attempt.setUser(user);
+        attempt.setScore(0);
         attempt.setTotal(total);
 
         for (Question q : quiz.getQuestions()) {
@@ -101,7 +114,6 @@ public class QuizController {
             String correctText = optionTextByLetter(q, q.getCorrectChoice());
 
             boolean isCorrect = selectedIndex != null && isCorrect(q, selectedIndex);
-
             if (isCorrect) {
                 score++;
             } else {
@@ -113,7 +125,6 @@ public class QuizController {
                 ));
             }
 
-            // Persist each answer
             if (selectedIndex != null) {
                 QuizAttemptAnswer answer = new QuizAttemptAnswer();
                 answer.setQuestion(q);
@@ -124,39 +135,70 @@ public class QuizController {
         }
 
         attempt.setScore(score);
+        QuizAttempt savedAttempt = quizAttemptRepository.save(attempt);
 
-        // Save attempt + answers (cascade persists answers)
-        quizAttemptRepository.save(attempt);
-
-        AttemptResultDto result =
-                new AttemptResultDto(quiz.getId(), score, total, incorrect);
-
+        AttemptResultDto result = new AttemptResultDto(quiz.getId(), score, total, incorrect);
         return ResponseEntity.ok(result);
     }
 
-    /**
-     * GET /api/quizzes/{quizId}/attempts/latest
-     * Returns most recent attempt summary
-     */
     @GetMapping("/{quizId}/attempts/latest")
-    public ResponseEntity<LatestAttemptDto> getLatestAttempt(@PathVariable Long quizId) {
+    public ResponseEntity<?> getLatestAttempt(
+            @PathVariable Long quizId,
+            Authentication authentication
+    ) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        User user = userRepository.findByEmail(authentication.getName()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
 
         return quizAttemptRepository
-                .findTopByQuizIdOrderByCreatedAtDesc(quizId)
-                .map(a -> ResponseEntity.ok(
+                .findTopByQuizIdAndUserIdOrderByCreatedAtDesc(quizId, user.getId())
+                .<ResponseEntity<?>>map(attempt -> ResponseEntity.ok(
                         new LatestAttemptDto(
-                                a.getId(),
-                                a.getQuiz().getId(),
-                                a.getScore(),
-                                a.getTotal(),
-                                a.getCreatedAt()
+                                attempt.getId(),
+                                attempt.getQuiz().getId(),
+                                attempt.getScore(),
+                                attempt.getTotal(),
+                                attempt.getCreatedAt()
                         )
                 ))
-                .orElse(ResponseEntity.noContent().build());
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/my-attempts")
+    public ResponseEntity<?> getMyAttempts(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        User user = userRepository.findByEmail(authentication.getName()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
+
+        List<QuizAttemptSummaryDto> attempts = quizAttemptRepository
+                .findByUserIdOrderByCreatedAtDesc(user.getId())
+                .stream()
+                .map(a -> new QuizAttemptSummaryDto(
+                        a.getId(),
+                        a.getQuiz().getId(),
+                        a.getQuiz().getTitle(),
+                        a.getQuiz().getLecture().getId(),
+                        a.getQuiz().getLecture().getTitle(),
+                        a.getScore(),
+                        a.getTotal(),
+                        a.getCreatedAt()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(attempts);
     }
 
     // ---------- helpers ----------
-
     private boolean isCorrect(Question q, int selectedIndex) {
         String correct = q.getCorrectChoice();
         int correctIndex = switch (correct) {

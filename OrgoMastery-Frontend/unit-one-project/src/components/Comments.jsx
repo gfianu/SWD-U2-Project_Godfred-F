@@ -1,66 +1,137 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Button from "../components/Button";
 import "../styles/comments.css";
+import { API_BASE_URL } from "../api/config";
+import { useAuth } from "../context/AuthContext";
 
-export default function Comments({ lectureTitle, videoId }) {
-  const storageKey = `comments_${lectureTitle}_${videoId}`;
+export default function Comments({ videoId }) {
+  const { token, user, isAuthenticated, isInstructor } = useAuth();
 
   const [comments, setComments] = useState([]);
   const [input, setInput] = useState("");
 
-  // Load stored comments
+  const [loading, setLoading] = useState(true);
+  const [posting, setPosting] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+
   useEffect(() => {
-    const saved = localStorage.getItem(storageKey);
-    if (saved) setComments(JSON.parse(saved));
-  }, [storageKey]);
+    let ignore = false;
 
-  // Save to localStorage
-  const saveComments = (updated) => {
-    setComments(updated);
-    localStorage.setItem(storageKey, JSON.stringify(updated));
-  };
+    async function loadComments() {
+      try {
+        setLoading(true);
+        setError("");
 
-  const addComment = () => {
+        const res = await fetch(`${API_BASE_URL}/api/comments/video/${videoId}`);
+        if (!res.ok) {
+          throw new Error(`Failed to load comments (${res.status})`);
+        }
+
+        const data = await res.json();
+        if (!ignore) {
+          setComments(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setError(err.message || "Failed to load comments.");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadComments();
+    return () => {
+      ignore = true;
+    };
+  }, [videoId]);
+
+  async function addComment() {
+    if (!isAuthenticated) {
+      setError("Please log in to post a comment.");
+      return;
+    }
+
     if (!input.trim()) return;
 
-    const newComment = {
-      id: Date.now(),
-      text: input.trim(),
-      replies: [],
-    };
+    try {
+      setPosting(true);
+      setError("");
+      setMessage("");
 
-    saveComments([...comments, newComment]);
-    setInput("");
-  };
+      const res = await fetch(`${API_BASE_URL}/api/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          videoId,
+          text: input.trim(),
+        }),
+      });
 
-  const addReply = (commentId, replyText) => {
-    if (!replyText.trim()) return;
+      const data = await safeReadJson(res);
 
-    const updated = comments.map((c) =>
-      c.id === commentId
-        ? {
-            ...c,
-            replies: [...c.replies, { id: Date.now(), text: replyText.trim() }],
-          }
-        : c
-    );
+      if (!res.ok) {
+        throw new Error(
+          typeof data === "string" ? data : data?.message || "Failed to post comment"
+        );
+      }
 
-    saveComments(updated);
-  };
+      setComments((prev) => [...prev, data]);
+      setInput("");
+      setMessage("Comment posted successfully.");
+    } catch (err) {
+      setError(err.message || "Failed to post comment.");
+    } finally {
+      setPosting(false);
+    }
+  }
 
-  const deleteComment = (commentId) => {
-    saveComments(comments.filter((c) => c.id !== commentId));
-  };
+  async function deleteComment(commentId) {
+    if (!isAuthenticated) return;
 
-  const deleteReply = (commentId, replyId) => {
-    const updated = comments.map((c) =>
-      c.id === commentId
-        ? { ...c, replies: c.replies.filter((r) => r.id !== replyId) }
-        : c
-    );
+    const confirmed = window.confirm("Delete this comment?");
+    if (!confirmed) return;
 
-    saveComments(updated);
-  };
+    try {
+      setDeletingId(commentId);
+      setError("");
+      setMessage("");
+
+      const res = await fetch(`${API_BASE_URL}/api/comments/${commentId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok && res.status !== 204) {
+        const data = await safeReadJson(res);
+        throw new Error(
+          typeof data === "string" ? data : data?.message || "Failed to delete comment"
+        );
+      }
+
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+      setMessage("Comment deleted.");
+    } catch (err) {
+      setError(err.message || "Failed to delete comment.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
+  function canDelete(comment) {
+    if (!user) return false;
+    return isInstructor || user.id === comment.userId;
+  }
 
   return (
     <div className="comments-container">
@@ -69,87 +140,78 @@ export default function Comments({ lectureTitle, videoId }) {
       {/* Comment input */}
       <div className="comment-input">
         <textarea
-          placeholder="Add a comment..."
+          placeholder={
+            isAuthenticated
+              ? "Add a comment..."
+              : "Log in to join the discussion..."
+          }
           value={input}
           onChange={(e) => setInput(e.target.value)}
-        ></textarea>
+          disabled={!isAuthenticated || posting}
+        />
 
-        <Button label="Post Comment" onClick={addComment} variant="primary" />
+        <Button
+          label={posting ? "Posting..." : "Post Comment"}
+          onClick={addComment}
+          variant="primary"
+          disabled={!isAuthenticated || posting || !input.trim()}
+        />
       </div>
+
+      {!isAuthenticated && (
+        <p className="muted">You must be logged in to post a comment.</p>
+      )}
+
+      {message && <p className="muted">{message}</p>}
+      {error && <p className="muted">{error}</p>}
 
       {/* Comments List */}
       <div className="comments-scroll-area">
-        <ul className="comments-list">
-          {comments.map((c) => (
-            <li key={c.id} className="comment-item">
-              <p className="comment-text">{c.text}</p>
+        {loading ? (
+          <p className="muted">Loading comments...</p>
+        ) : comments.length === 0 ? (
+          <p className="muted">No comments yet. Start the discussion.</p>
+        ) : (
+          <ul className="comments-list">
+            {comments.map((c) => (
+              <li key={c.id} className="comment-item">
+                <div className="comment-meta">
+                  <strong>{c.username}</strong>
+                  {c.role ? <span className="comment-role"> ({c.role})</span> : null}
+                  {c.createdAt ? (
+                    <span className="comment-date">
+                      {" "}
+                      • {new Date(c.createdAt).toLocaleString()}
+                    </span>
+                  ) : null}
+                </div>
 
-              <div className="comment-actions">
-                <ReplyBox onReply={(text) => addReply(c.id, text)} />
-                <button
-                  className="delete-btn"
-                  onClick={() => deleteComment(c.id)}
-                >
-                  Delete
-                </button>
-              </div>
+                <p className="comment-text">{c.text}</p>
 
-              {/* Replies */}
-              {c.replies.length > 0 && (
-                <ul className="reply-list">
-                  {c.replies.map((r) => (
-                    <li key={r.id} className="reply-item">
-                      <p className="reply-text">{r.text}</p>
-                      <button
-                        className="delete-btn"
-                        onClick={() => deleteReply(c.id, r.id)}
-                      >
-                        Delete
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul>
+                {canDelete(c) && (
+                  <div className="comment-actions">
+                    <button
+                      className="delete-btn"
+                      onClick={() => deleteComment(c.id)}
+                      disabled={deletingId === c.id}
+                    >
+                      {deletingId === c.id ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
 }
 
-/* ---------- Reply Box Component ---------- */
-function ReplyBox({ onReply }) {
-  const [reply, setReply] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const submitReply = () => {
-    if (!reply.trim()) return;
-    onReply(reply);
-    setReply("");
-    setOpen(false);
-  };
-
-  return (
-    <div className="reply-box">
-      {!open ? (
-        // KEEP Reply button subtle
-        <button className="reply-btn" onClick={() => setOpen(true)}>
-          Reply
-        </button>
-      ) : (
-        <div className="reply-input">
-          <input
-            type="text"
-            value={reply}
-            placeholder="Write a reply..."
-            onChange={(e) => setReply(e.target.value)}
-          />
-
-          {/* Use reusable Button for Send */}
-          <Button label="Send" onClick={submitReply} variant="secondary" />
-        </div>
-      )}
-    </div>
-  );
+async function safeReadJson(res) {
+  const contentType = res.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return res.json();
+  }
+  return res.text();
 }

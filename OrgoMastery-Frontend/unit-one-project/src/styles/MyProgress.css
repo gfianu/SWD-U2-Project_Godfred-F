@@ -1,0 +1,88 @@
+.progress-page {
+  margin-top: 2rem;
+}
+
+.progress-header {
+  margin-bottom: 1.5rem;
+}
+
+.progress-subtitle {
+  color: #6b7280;
+  margin-top: 0.35rem;
+}
+
+.progress-empty {
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.progress-link-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+}
+
+.progress-link-btn:hover {
+  background: var(--primary-dark);
+  text-decoration: none;
+}
+
+.progress-table-wrap {
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.progress-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.progress-table th,
+.progress-table td {
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.progress-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.progress-table tr:last-child td {
+  border-bottom: none;
+}
+
+.progress-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.progress-actions a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.progress-actions a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .progress-table th,
+  .progress-table td {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+}

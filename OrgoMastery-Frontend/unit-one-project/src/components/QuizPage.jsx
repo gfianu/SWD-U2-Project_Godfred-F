@@ -3,9 +3,11 @@ import { Link, useParams } from "react-router-dom";
 import "../styles/QuizPage.css";
 import Button from "./Button";
 import { API_BASE_URL } from "../api/config";
+import { useAuth } from "../context/AuthContext";
 
 export default function QuizPage() {
   const { quizId } = useParams();
+  const { token, isAuthenticated } = useAuth();
 
   const [quiz, setQuiz] = useState(null);
 
@@ -59,7 +61,6 @@ export default function QuizPage() {
   const selectedIndex =
     currentQuestion ? answers[currentQuestion.id] ?? null : null;
 
-  // Require *all* questions answered before submit (more robust)
   const allAnswered =
     questions.length > 0 && questions.every((q) => answers[q.id] !== undefined);
 
@@ -80,6 +81,11 @@ export default function QuizPage() {
   async function handleSubmit() {
     if (!quiz) return;
 
+    if (!isAuthenticated || !token) {
+      setSubmitError("Please log in to submit a quiz attempt.");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setSubmitError("");
@@ -95,17 +101,25 @@ export default function QuizPage() {
 
       const res = await fetch(`${API_BASE_URL}/api/quizzes/${quiz.id}/attempts`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error(`Submit failed (${res.status})`);
+      if (res.status === 401) {
+        throw new Error("Please log in to submit a quiz attempt.");
+      }
+
+      if (!res.ok) {
+        throw new Error(`Submit failed (${res.status})`);
+      }
 
       const data = await res.json();
       setResult(data);
       setSubmitted(true);
 
-      // Store activity consistently by lectureId
       localStorage.setItem(
         `activity_${quiz.lectureId}`,
         `Completed Quiz (${data.score} correct)`
@@ -118,7 +132,6 @@ export default function QuizPage() {
   }
 
   function handleRetake() {
-    // reset local UI state; keeps quiz loaded
     setCurrentIndex(0);
     setAnswers({});
     setSubmitted(false);
@@ -162,11 +175,16 @@ export default function QuizPage() {
     );
   }
 
-  // ---------- main UI ----------
   return (
     <section className="quiz-page container">
       <h2>{quiz.title}</h2>
       {quiz.description ? <p className="muted">{quiz.description}</p> : null}
+
+      {!isAuthenticated && !submitted && (
+        <p className="muted">
+          Please <Link to="/login">log in</Link> to submit your quiz attempt.
+        </p>
+      )}
 
       {!submitted ? (
         <>
@@ -211,7 +229,12 @@ export default function QuizPage() {
                 label={submitting ? "Submitting…" : "Submit Quiz"}
                 variant="primary"
                 onClick={handleSubmit}
-                disabled={!allAnswered || submitting || questions.length === 0}
+                disabled={
+                  !isAuthenticated ||
+                  !allAnswered ||
+                  submitting ||
+                  questions.length === 0
+                }
               />
             ) : (
               <Button
@@ -257,7 +280,6 @@ export default function QuizPage() {
           </div>
 
           <div style={{ marginTop: "1rem" }}>
-            {/* More future-proof than "to=.." if routing changes later */}
             <Link to={`/lectures/${quiz.lectureId}/quizzes`}>
               <Button label="Back to Quizzes" variant="secondary" />
             </Link>

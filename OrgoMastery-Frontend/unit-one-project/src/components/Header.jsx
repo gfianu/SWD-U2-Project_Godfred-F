@@ -56,6 +56,12 @@ export default function Header() {
             Lectures
           </NavLink>
 
+          {isAuthenticated && (
+            <NavLink to="/progress" onClick={closeMenu}>
+              My Progress
+            </NavLink>
+          )}
+
           {isAuthenticated && isInstructor && (
             <NavLink to="/instructor" onClick={closeMenu}>
               Instructor

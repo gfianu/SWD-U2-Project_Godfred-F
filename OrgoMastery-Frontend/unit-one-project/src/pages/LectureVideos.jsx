@@ -45,10 +45,7 @@ export default function LectureVideos() {
               </div>
 
               {/* Comments for this video */}
-              <Comments
-                videoId={video.id}
-                lectureTitle={lecture?.title || ""}
-              />
+              <Comments videoId={video.id} />
             </li>
           ))}
         </ul>
