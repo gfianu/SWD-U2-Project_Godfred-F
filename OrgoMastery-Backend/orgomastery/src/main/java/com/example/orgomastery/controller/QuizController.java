@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/quizzes")
@@ -135,7 +137,7 @@ public class QuizController {
         }
 
         attempt.setScore(score);
-        QuizAttempt savedAttempt = quizAttemptRepository.save(attempt);
+        quizAttemptRepository.save(attempt);
 
         AttemptResultDto result = new AttemptResultDto(quiz.getId(), score, total, incorrect);
         return ResponseEntity.ok(result);
@@ -198,6 +200,101 @@ public class QuizController {
         return ResponseEntity.ok(attempts);
     }
 
+    @GetMapping("/{quizId}/analytics")
+    public ResponseEntity<?> getQuizAnalytics(
+            @PathVariable Long quizId,
+            Authentication authentication
+    ) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        User currentUser = userRepository.findByEmail(authentication.getName()).orElse(null);
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
+
+        if (!"INSTRUCTOR".equals(currentUser.getRole().name())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Instructor access required");
+        }
+
+        Quiz quiz = quizRepository.findById(quizId).orElse(null);
+        if (quiz == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<QuizAttempt> attempts = quizAttemptRepository.findByQuizIdOrderByCreatedAtDesc(quizId);
+
+        int attemptCount = attempts.size();
+
+        double averageScore = attemptCount == 0
+                ? 0.0
+                : attempts.stream().mapToInt(QuizAttempt::getScore).average().orElse(0.0);
+
+        double averagePercent = attemptCount == 0
+                ? 0.0
+                : attempts.stream()
+                .mapToDouble(a -> a.getTotal() == 0 ? 0.0 : (a.getScore() * 100.0) / a.getTotal())
+                .average()
+                .orElse(0.0);
+
+        Integer highestScore = attemptCount == 0
+                ? 0
+                : attempts.stream().map(QuizAttempt::getScore).max(Integer::compareTo).orElse(0);
+
+        Integer lowestScore = attemptCount == 0
+                ? 0
+                : attempts.stream().map(QuizAttempt::getScore).min(Integer::compareTo).orElse(0);
+
+        Map<Long, List<QuizAttempt>> attemptsByUser = attempts.stream()
+                .collect(Collectors.groupingBy(a -> a.getUser().getId()));
+
+        List<StudentAttemptStatsDto> studentStats = attemptsByUser.values().stream()
+                .map(userAttempts -> {
+                    userAttempts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+
+                    QuizAttempt latest = userAttempts.get(0);
+                    User student = latest.getUser();
+
+                    int bestScore = userAttempts.stream()
+                            .map(QuizAttempt::getScore)
+                            .max(Integer::compareTo)
+                            .orElse(0);
+
+                    return new StudentAttemptStatsDto(
+                            student.getId(),
+                            student.getUsername(),
+                            student.getEmail(),
+                            userAttempts.size(),
+                            bestScore,
+                            latest.getScore(),
+                            latest.getTotal(),
+                            latest.getCreatedAt()
+                    );
+                })
+                .sorted((a, b) -> {
+                    LocalDateTime timeA = a.getLatestAttemptAt();
+                    LocalDateTime timeB = b.getLatestAttemptAt();
+                    return timeB.compareTo(timeA);
+                })
+                .toList();
+
+        QuizAnalyticsDto dto = new QuizAnalyticsDto(
+                quiz.getId(),
+                quiz.getTitle(),
+                quiz.getLecture().getId(),
+                quiz.getLecture().getTitle(),
+                attemptCount,
+                roundTwoDecimals(averageScore),
+                roundTwoDecimals(averagePercent),
+                highestScore,
+                lowestScore,
+                studentStats
+        );
+
+        return ResponseEntity.ok(dto);
+    }
+
     // ---------- helpers ----------
     private boolean isCorrect(Question q, int selectedIndex) {
         String correct = q.getCorrectChoice();
@@ -235,6 +332,10 @@ public class QuizController {
             case "D" -> q.getChoiceD();
             default -> "Unknown";
         };
+    }
+
+    private double roundTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }
 

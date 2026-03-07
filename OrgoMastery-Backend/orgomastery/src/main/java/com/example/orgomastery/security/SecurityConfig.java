@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/quizzes/my-attempts").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/comments").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/comments/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/quizzes/*/analytics").hasRole("INSTRUCTOR")
                         .requestMatchers(HttpMethod.POST, "/api/questions/**").hasRole("INSTRUCTOR")
                         .requestMatchers(HttpMethod.PUT, "/api/questions/**").hasRole("INSTRUCTOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/questions/**").hasRole("INSTRUCTOR")
