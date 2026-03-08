@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import InstructorDashboard from "./pages/InstructorDashboard";
+import MyProgress from "./pages/MyProgress";
 
 import LectureList from "./components/LectureList";
 import LectureTopicLayout from "./pages/LectureTopicLayout";
@@ -22,6 +23,7 @@ import QuizPage from "./components/QuizPage";
 
 import InstructorLectureManager from "./pages/InstructorLectureManager";
 import InstructorQuestionManager from "./pages/InstructorQuestionManager";
+import InstructorQuizAnalytics from "./pages/InstructorQuizAnalytics";
 
 function App() {
   return (
@@ -48,6 +50,15 @@ function App() {
           </Route>
 
           <Route
+            path="/progress"
+            element={
+              <ProtectedRoute>
+                <MyProgress />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/instructor"
             element={
               <ProtectedRoute requireInstructor={true}>
@@ -70,6 +81,15 @@ function App() {
             element={
               <ProtectedRoute requireInstructor={true}>
                 <InstructorQuestionManager />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/instructor/analytics"
+            element={
+              <ProtectedRoute requireInstructor={true}>
+                <InstructorQuizAnalytics />
               </ProtectedRoute>
             }
           />

@@ -13,13 +13,13 @@ public class QuizAttempt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Many attempts belong to one quiz
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
 
-    // Later: attach to User (nullable for now)
-    // private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private Integer score;
@@ -30,18 +30,15 @@ public class QuizAttempt {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(
-            mappedBy = "attempt",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
+    @OneToMany(mappedBy = "attempt", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuizAttemptAnswer> answers = new ArrayList<>();
 
-    public QuizAttempt() {}
+    public QuizAttempt() {
+    }
 
-    public QuizAttempt(Quiz quiz, Integer score, Integer total) {
+    public QuizAttempt(Quiz quiz, User user, Integer score, Integer total) {
         this.quiz = quiz;
+        this.user = user;
         this.score = score;
         this.total = total;
     }
@@ -56,20 +53,51 @@ public class QuizAttempt {
         answer.setAttempt(this);
     }
 
-    // --- Getters/Setters ---
-    public Long getId() { return id; }
+    public Long getId() {
+        return id;
+    }
 
-    public Quiz getQuiz() { return quiz; }
-    public void setQuiz(Quiz quiz) { this.quiz = quiz; }
+    public Quiz getQuiz() {
+        return quiz;
+    }
 
-    public Integer getScore() { return score; }
-    public void setScore(Integer score) { this.score = score; }
+    public void setQuiz(Quiz quiz) {
+        this.quiz = quiz;
+    }
 
-    public Integer getTotal() { return total; }
-    public void setTotal(Integer total) { this.total = total; }
+    public User getUser() {
+        return user;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-    public List<QuizAttemptAnswer> getAnswers() { return answers; }
-    public void setAnswers(List<QuizAttemptAnswer> answers) { this.answers = answers; }
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    public Integer getTotal() {
+        return total;
+    }
+
+    public void setTotal(Integer total) {
+        this.total = total;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public List<QuizAttemptAnswer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<QuizAttemptAnswer> answers) {
+        this.answers = answers;
+    }
 }

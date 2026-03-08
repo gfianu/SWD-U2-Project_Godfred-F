@@ -1,0 +1,145 @@
+.iqa-page {
+  margin-top: 2rem;
+}
+
+.iqa-subtitle {
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.iqa-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.iqa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.iqa-field label {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.iqa-field select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font: inherit;
+  background: #fff;
+}
+
+.iqa-field select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.iqa-message {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.iqa-message.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.iqa-empty {
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.iqa-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.iqa-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.iqa-card h3 {
+  margin-bottom: 0.5rem;
+}
+
+.iqa-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 0.25rem;
+}
+
+.iqa-label {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.iqa-table-wrap {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.iqa-table-title {
+  margin-bottom: 1rem;
+}
+
+.iqa-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.iqa-table th,
+.iqa-table td {
+  text-align: left;
+  padding: 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.iqa-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.iqa-table tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .iqa-summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .iqa-table th,
+  .iqa-table td {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .iqa-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
