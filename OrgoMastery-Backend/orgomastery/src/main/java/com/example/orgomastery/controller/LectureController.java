@@ -6,6 +6,8 @@ import com.example.orgomastery.model.LectureNote;
 import com.example.orgomastery.model.LectureVideo;
 import com.example.orgomastery.model.Quiz;
 import com.example.orgomastery.repository.LectureRepository;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/lectures")
-@CrossOrigin(origins = "http://localhost:5173") // Vite dev server; adjust for Netlify later
+@CrossOrigin(origins = "http://localhost:5173")
 public class LectureController {
 
     private final LectureRepository lectureRepository;
@@ -24,31 +26,20 @@ public class LectureController {
         this.lectureRepository = lectureRepository;
     }
 
-    /**
-     * GET /api/lectures
-     * Returns: [{ id, title }, ...]
-     */
     @GetMapping
-    public List<LectureSummaryDto> getAllLectures() {
-        List<Lecture> lectures = lectureRepository.findAllByOrderByOrderIndexAscIdAsc();
-
-        return lectures.stream()
+    public ResponseEntity<List<LectureSummaryDto>> getAllLectures() {
+        List<LectureSummaryDto> lectures = lectureRepository.findAllByOrderByOrderIndexAscIdAsc()
+                .stream()
                 .map(l -> new LectureSummaryDto(l.getId(), l.getTitle()))
                 .toList();
+
+        return ResponseEntity.ok(lectures);
     }
 
-    /**
-     * GET /api/lectures/{lectureId}
-     * Returns: { id, title, videos[], notes[], quizzes[] }
-     *
-     * NOTE: This was marked @Transactional so lazy-loaded collections (videos/notes/quizzes)
-     * can be read safely while the DTO is built.
-     */
-    @GetMapping("/{lectureId}")
+    @GetMapping("/{id}")
     @Transactional(readOnly = true)
-    public ResponseEntity<LectureDetailDto> getLectureDetail(@PathVariable Long lectureId) {
-
-        Lecture lecture = lectureRepository.findById(lectureId).orElse(null);
+    public ResponseEntity<LectureDetailDto> getLectureById(@PathVariable Long id) {
+        Lecture lecture = lectureRepository.findById(id).orElse(null);
         if (lecture == null) {
             return ResponseEntity.notFound().build();
         }
@@ -68,7 +59,7 @@ public class LectureController {
                 .toList();
 
         List<QuizSummaryDto> quizzes = lecture.getQuizzes().stream()
-                .filter(Quiz::isPublished) // keep unpublished hidden by default
+                .sorted(Comparator.comparing(Quiz::getId))
                 .map(q -> new QuizSummaryDto(q.getId(), lecture.getId(), q.getTitle(), q.getDescription()))
                 .toList();
 
@@ -82,4 +73,48 @@ public class LectureController {
 
         return ResponseEntity.ok(dto);
     }
+
+    @PostMapping
+    public ResponseEntity<LectureSummaryDto> createLecture(
+            @Valid @RequestBody LectureCreateRequest request
+    ) {
+        Lecture lecture = new Lecture();
+        lecture.setTitle(request.getTitle().trim());
+        lecture.setOrderIndex(request.getOrderIndex());
+
+        Lecture saved = lectureRepository.save(lecture);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new LectureSummaryDto(saved.getId(), saved.getTitle()));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateLecture(
+            @PathVariable Long id,
+            @Valid @RequestBody LectureUpdateRequest request
+    ) {
+        Lecture lecture = lectureRepository.findById(id).orElse(null);
+        if (lecture == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        lecture.setTitle(request.getTitle().trim());
+        lecture.setOrderIndex(request.getOrderIndex());
+
+        Lecture saved = lectureRepository.save(lecture);
+
+        return ResponseEntity.ok(new LectureSummaryDto(saved.getId(), saved.getTitle()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteLecture(@PathVariable Long id) {
+        Lecture lecture = lectureRepository.findById(id).orElse(null);
+        if (lecture == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        lectureRepository.delete(lecture);
+        return ResponseEntity.noContent().build();
+    }
 }
+
