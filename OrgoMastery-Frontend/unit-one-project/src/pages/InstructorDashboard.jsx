@@ -75,11 +75,11 @@ export default function InstructorDashboard() {
           >
             <h3 style={{ marginBottom: "0.5rem" }}>Analytics</h3>
             <p style={{ color: "#666", marginBottom: "1rem" }}>
-              View quiz attempts, progress, and performance trends.
+              View quiz attempts, student performance, and score trends.
             </p>
-            <button type="button" disabled>
-              Coming Soon
-            </button>
+            <Link to="/instructor/analytics">
+              <button type="button">Go to Analytics</button>
+            </Link>
           </div>
 
           <div

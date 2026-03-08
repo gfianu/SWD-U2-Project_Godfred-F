@@ -23,6 +23,7 @@ import QuizPage from "./components/QuizPage";
 
 import InstructorLectureManager from "./pages/InstructorLectureManager";
 import InstructorQuestionManager from "./pages/InstructorQuestionManager";
+import InstructorQuizAnalytics from "./pages/InstructorQuizAnalytics";
 
 function App() {
   return (
@@ -80,6 +81,15 @@ function App() {
             element={
               <ProtectedRoute requireInstructor={true}>
                 <InstructorQuestionManager />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/instructor/analytics"
+            element={
+              <ProtectedRoute requireInstructor={true}>
+                <InstructorQuizAnalytics />
               </ProtectedRoute>
             }
           />
