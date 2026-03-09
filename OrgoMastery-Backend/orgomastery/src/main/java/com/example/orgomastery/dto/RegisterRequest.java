@@ -1,9 +1,7 @@
 package com.example.orgomastery.dto;
 
-import com.example.orgomastery.model.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
@@ -19,9 +17,6 @@ public class RegisterRequest {
     @NotBlank
     @Size(min = 6, max = 100)
     private String password;
-
-    @NotNull
-    private Role role;
 
     public RegisterRequest() {
     }
@@ -48,13 +43,5 @@ public class RegisterRequest {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 }
