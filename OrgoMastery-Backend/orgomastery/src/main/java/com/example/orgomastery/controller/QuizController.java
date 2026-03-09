@@ -1,11 +1,13 @@
 package com.example.orgomastery.controller;
 
 import com.example.orgomastery.dto.*;
+import com.example.orgomastery.model.Lecture;
 import com.example.orgomastery.model.Question;
 import com.example.orgomastery.model.Quiz;
 import com.example.orgomastery.model.QuizAttempt;
 import com.example.orgomastery.model.QuizAttemptAnswer;
 import com.example.orgomastery.model.User;
+import com.example.orgomastery.repository.LectureRepository;
 import com.example.orgomastery.repository.QuestionRepository;
 import com.example.orgomastery.repository.QuizAttemptRepository;
 import com.example.orgomastery.repository.QuizRepository;
@@ -31,17 +33,20 @@ public class QuizController {
     private final QuestionRepository questionRepository;
     private final QuizAttemptRepository quizAttemptRepository;
     private final UserRepository userRepository;
+    private final LectureRepository lectureRepository;
 
     public QuizController(
             QuizRepository quizRepository,
             QuestionRepository questionRepository,
             QuizAttemptRepository quizAttemptRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            LectureRepository lectureRepository
     ) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
         this.quizAttemptRepository = quizAttemptRepository;
         this.userRepository = userRepository;
+        this.lectureRepository = lectureRepository;
     }
 
     @GetMapping("/{quizId}")
@@ -70,6 +75,66 @@ public class QuizController {
         );
 
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createQuiz(@Valid @RequestBody QuizCreateRequest request) {
+        Lecture lecture = lectureRepository.findById(request.getLectureId()).orElse(null);
+        if (lecture == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lecture not found");
+        }
+
+        Quiz quiz = new Quiz();
+        quiz.setLecture(lecture);
+        quiz.setTitle(request.getTitle().trim());
+        quiz.setDescription(trimToNull(request.getDescription()));
+
+        Quiz saved = quizRepository.save(quiz);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                new QuizSummaryDto(
+                        saved.getId(),
+                        lecture.getId(),
+                        saved.getTitle(),
+                        saved.getDescription()
+                )
+        );
+    }
+
+    @PutMapping("/{quizId}")
+    public ResponseEntity<?> updateQuiz(
+            @PathVariable Long quizId,
+            @Valid @RequestBody QuizUpdateRequest request
+    ) {
+        Quiz quiz = quizRepository.findById(quizId).orElse(null);
+        if (quiz == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        quiz.setTitle(request.getTitle().trim());
+        quiz.setDescription(trimToNull(request.getDescription()));
+
+        Quiz saved = quizRepository.save(quiz);
+
+        return ResponseEntity.ok(
+                new QuizSummaryDto(
+                        saved.getId(),
+                        saved.getLecture().getId(),
+                        saved.getTitle(),
+                        saved.getDescription()
+                )
+        );
+    }
+
+    @DeleteMapping("/{quizId}")
+    public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId).orElse(null);
+        if (quiz == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        quizRepository.delete(quiz);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{quizId}/attempts")
@@ -214,8 +279,9 @@ public class QuizController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
         }
 
-        if (!"INSTRUCTOR".equals(currentUser.getRole().name())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Instructor access required");
+        if (!"INSTRUCTOR".equals(currentUser.getRole().name()) &&
+                !"ADMIN".equals(currentUser.getRole().name())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Instructor or admin access required");
         }
 
         Quiz quiz = quizRepository.findById(quizId).orElse(null);
@@ -336,6 +402,12 @@ public class QuizController {
 
     private double roundTwoDecimals(double value) {
         return Math.round(value * 100.0) / 100.0;
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) return null;
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
 
