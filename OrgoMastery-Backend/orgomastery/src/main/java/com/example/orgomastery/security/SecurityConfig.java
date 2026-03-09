@@ -45,15 +45,34 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/lectures/**", "/api/quizzes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
+
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/quizzes/*/analytics").hasAnyRole("INSTRUCTOR", "ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/api/quizzes/*/attempts").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/quizzes/*/attempts/latest").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/quizzes/my-attempts").authenticated()
+
                         .requestMatchers(HttpMethod.POST, "/api/comments").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/comments/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/quizzes/*/analytics").hasRole("INSTRUCTOR")
-                        .requestMatchers(HttpMethod.POST, "/api/questions/**").hasRole("INSTRUCTOR")
-                        .requestMatchers(HttpMethod.PUT, "/api/questions/**").hasRole("INSTRUCTOR")
-                        .requestMatchers(HttpMethod.DELETE, "/api/questions/**").hasRole("INSTRUCTOR")
+
+                        .requestMatchers(HttpMethod.POST, "/api/lectures").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/lectures/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/lectures/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/videos").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/videos/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/videos/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/notes").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/notes/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/notes/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/questions/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/questions/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/questions/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

@@ -62,6 +62,12 @@ export default function Header() {
             </NavLink>
           )}
 
+          {isAuthenticated && user?.role === "ADMIN" && (
+            <NavLink to="/admin/users" onClick={closeMenu}>
+              Admin
+            </NavLink>
+          )}
+
           {isAuthenticated && isInstructor && (
             <NavLink to="/instructor" onClick={closeMenu}>
               Instructor

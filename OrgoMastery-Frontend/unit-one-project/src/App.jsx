@@ -24,6 +24,7 @@ import QuizPage from "./components/QuizPage";
 import InstructorLectureManager from "./pages/InstructorLectureManager";
 import InstructorQuestionManager from "./pages/InstructorQuestionManager";
 import InstructorQuizAnalytics from "./pages/InstructorQuizAnalytics";
+import AdminUserManager from "./pages/AdminUserManager";
 
 function App() {
   return (
@@ -90,6 +91,15 @@ function App() {
             element={
               <ProtectedRoute requireInstructor={true}>
                 <InstructorQuizAnalytics />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminUserManager />
               </ProtectedRoute>
             }
           />

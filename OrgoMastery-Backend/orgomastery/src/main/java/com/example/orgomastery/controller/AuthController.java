@@ -1,6 +1,7 @@
 package com.example.orgomastery.controller;
 
 import com.example.orgomastery.dto.*;
+import com.example.orgomastery.model.Role;
 import com.example.orgomastery.model.User;
 import com.example.orgomastery.repository.UserRepository;
 import com.example.orgomastery.security.JwtService;
@@ -42,11 +43,12 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Username already in use");
         }
 
+        // Force all public registrations to STUDENT
         User user = new User(
-                request.getUsername(),
-                request.getEmail(),
+                request.getUsername().trim(),
+                request.getEmail().trim(),
                 passwordEncoder.encode(request.getPassword()),
-                request.getRole()
+                Role.STUDENT
         );
 
         User saved = userRepository.save(user);
