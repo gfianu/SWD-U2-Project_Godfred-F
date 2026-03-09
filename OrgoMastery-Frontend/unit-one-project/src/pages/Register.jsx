@@ -10,7 +10,6 @@ export default function Register() {
     username: "",
     email: "",
     password: "",
-    role: "STUDENT",
   });
 
   const [error, setError] = useState("");
@@ -27,7 +26,10 @@ export default function Register() {
 
     try {
       setSubmitting(true);
+
+      // Role is no longer sent — backend automatically sets STUDENT
       await register(formData);
+
       navigate("/");
     } catch (err) {
       setError(err.message || "Registration failed.");
@@ -38,7 +40,7 @@ export default function Register() {
 
   return (
     <section className="container" style={{ maxWidth: "500px", marginTop: "2rem" }}>
-      <h2>Register</h2>
+      <h2>Create Account</h2>
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "1rem" }}>
@@ -77,23 +79,10 @@ export default function Register() {
           />
         </div>
 
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Role</label>
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            style={{ width: "100%", padding: "0.75rem", marginTop: "0.25rem" }}
-          >
-            <option value="STUDENT">Student</option>
-            <option value="INSTRUCTOR">Instructor</option>
-          </select>
-        </div>
-
         {error && <p className="muted">{error}</p>}
 
         <button type="submit" disabled={submitting}>
-          {submitting ? "Registering..." : "Register"}
+          {submitting ? "Registering..." : "Create Account"}
         </button>
       </form>
 
