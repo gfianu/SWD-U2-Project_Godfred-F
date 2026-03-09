@@ -1,6 +1,7 @@
 .contact-container {
   max-width: 900px;
   padding: 2rem 1rem;
+  margin: 0 auto;
 }
 
 .contact-title {
@@ -14,11 +15,12 @@
   font-size: 1.1rem;
   margin-bottom: 2rem;
   color: var(--text-muted);
+  line-height: 1.7;
 }
 
 /* Success message */
 .contact-success {
-  background: #e0ffe6;
+  background: #ecfdf5;
   border-left: 4px solid #16a34a;
   padding: 1rem;
   border-radius: 6px;
@@ -51,6 +53,12 @@
   border-radius: 6px;
   font-size: 1rem;
   background: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 140px;
 }
 
 .contact-form input:focus,
@@ -65,9 +73,5 @@
 @media (max-width: 600px) {
   .contact-container {
     padding: 1rem 0.5rem;
-  }
-
-  .contact-submit-btn {
-    width: 100%;
   }
 }

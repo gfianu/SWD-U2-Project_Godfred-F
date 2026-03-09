@@ -1,51 +1,51 @@
 import { useState } from "react";
 import Button from "../components/Button";
+import { useAuth } from "../context/AuthContext";
 import "../styles/ContactPage.css";
 
 function Contact() {
-  // Form state
+  const { user } = useAuth();
+
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    name: user?.username || "",
+    email: user?.email || "",
     reason: "feedback",
     message: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
 
-  // Handle input changes
   function handleChange(e) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  // Handle form submission
   function handleSubmit(e) {
     e.preventDefault();
-    setSubmitted(true);
 
-    // (Optional) can connect this to an API later:
-    // fetch("/api/contact", { method: "POST", body: JSON.stringify(formData) })
+    // Future: connect to backend API
+    console.log("Contact form submission:", formData);
+
+    setSubmitted(true);
   }
 
   return (
     <section className="contact-container container">
-      <h1 className="contact-title">Contact ChemLearn</h1>
+      <h1 className="contact-title">Contact OrgoMastery</h1>
+
       <p className="contact-subtitle">
-        We'd love to hear from you! Whether you have feedback, questions, or
-        ideas for new features, feel free to reach out.
+        Have feedback, questions, or ideas for improving OrgoMastery? We'd love
+        to hear from you. Send us a message and we’ll get back to you as soon as
+        possible.
       </p>
 
-      {/* Success Message */}
       {submitted && (
         <div className="contact-success">
-          Thank you for your message! We’ll get back to you soon.
+          Thank you for your message! We appreciate your feedback.
         </div>
       )}
 
-      {/* Contact Form */}
       <form className="contact-form" onSubmit={handleSubmit}>
-        {/* Name */}
         <label>
           Full Name
           <input
@@ -58,7 +58,6 @@ function Contact() {
           />
         </label>
 
-        {/* Email */}
         <label>
           Email Address
           <input
@@ -71,7 +70,6 @@ function Contact() {
           />
         </label>
 
-        {/* Reason for Contact */}
         <label>
           Reason for Contact
           <select name="reason" value={formData.reason} onChange={handleChange}>
@@ -81,7 +79,6 @@ function Contact() {
           </select>
         </label>
 
-        {/* Message */}
         <label>
           Your Message
           <textarea
@@ -94,7 +91,6 @@ function Contact() {
           ></textarea>
         </label>
 
-        {/* Submit */}
         <Button label="Submit Message" type="submit" fullWidth={true} />
       </form>
     </section>

@@ -21,8 +21,6 @@ function Home() {
   return (
     <section className="start-hero">
       <div className="start-content fade-in">
-        
-        {/* Logo Image */}
         <img
           ref={logoRef}
           src={OrgoMasteryLogo}
@@ -30,14 +28,22 @@ function Home() {
           className="hero-logo logo-fade"
         />
 
+        <h1 className="hero-heading slide-up">
+          Learn Organic Chemistry with Confidence
+        </h1>
+
         <p className="tagline slide-up">
-          Master Organic Chemistry with Lectures, Notes, and Quizzes.
+          OrgoMastery helps students build understanding through structured
+          lectures, guided notes, interactive quizzes, and progress tracking.
         </p>
 
-        {/* Get Started button fades in AFTER tagline */}
-        <div className="button-fade">
+        <div className="button-fade hero-actions">
           <Link to="/lectures">
             <Button label="Get Started" size="large" />
+          </Link>
+
+          <Link to="/about">
+            <Button label="Learn More" variant="secondary" size="large" />
           </Link>
         </div>
       </div>

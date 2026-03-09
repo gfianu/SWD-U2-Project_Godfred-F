@@ -35,46 +35,90 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
+
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
                 .authorizeHttpRequests(auth -> auth
+
+                        // Public authentication
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/lectures/**", "/api/quizzes/**").permitAll()
+
+                        // Public content
+                        .requestMatchers(HttpMethod.GET, "/api/lectures/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/quizzes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
 
+                        // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, "/api/quizzes/*/analytics").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        // Quiz analytics
+                        .requestMatchers(HttpMethod.GET, "/api/quizzes/*/analytics")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/quizzes/*/attempts").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/quizzes/*/attempts/latest").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/quizzes/my-attempts").authenticated()
+                        // Quiz attempts
+                        .requestMatchers(HttpMethod.POST, "/api/quizzes/*/attempts")
+                        .authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/quizzes/*/attempts/latest")
+                        .authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/quizzes/my-attempts")
+                        .authenticated()
 
-                        .requestMatchers(HttpMethod.POST, "/api/comments").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/comments/**").authenticated()
+                        // Quiz CRUD
+                        .requestMatchers(HttpMethod.POST, "/api/quizzes")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/quizzes/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/quizzes/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/lectures").hasAnyRole("INSTRUCTOR", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/lectures/**").hasAnyRole("INSTRUCTOR", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/lectures/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        // Comments
+                        .requestMatchers(HttpMethod.POST, "/api/comments")
+                        .authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/comments/**")
+                        .authenticated()
 
-                        .requestMatchers(HttpMethod.POST, "/api/videos").hasAnyRole("INSTRUCTOR", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/videos/**").hasAnyRole("INSTRUCTOR", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/videos/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        // Lecture CRUD
+                        .requestMatchers(HttpMethod.POST, "/api/lectures")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/lectures/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/lectures/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/notes").hasAnyRole("INSTRUCTOR", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/notes/**").hasAnyRole("INSTRUCTOR", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/notes/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        // Video CRUD
+                        .requestMatchers(HttpMethod.POST, "/api/videos")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/videos/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/videos/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/questions/**").hasAnyRole("INSTRUCTOR", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/questions/**").hasAnyRole("INSTRUCTOR", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/questions/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        // Note CRUD
+                        .requestMatchers(HttpMethod.POST, "/api/notes")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/notes/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/notes/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
 
+                        // Question CRUD
+                        .requestMatchers(HttpMethod.POST, "/api/questions/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/questions/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/questions/**")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
+
+                        // Everything else
                         .anyRequest().authenticated()
                 )
+
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -83,6 +127,7 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -92,12 +137,14 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+        DaoAuthenticationProvider provider =
+                new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }

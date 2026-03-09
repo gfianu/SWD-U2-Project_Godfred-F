@@ -1,53 +1,80 @@
+import "../styles/About.css";
+
 function About() {
   return (
-    <section className="container" style={{ maxWidth: "900px", padding: "2rem 1rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem", color: "#1e3a8a" }}>
-        About ChemLearn
-      </h1>
+    <section className="about-container">
+      <h1 className="about-title">About OrgoMastery</h1>
 
-      <p style={{ marginBottom: "1.5rem", lineHeight: "1.7", fontSize: "1.1rem" }}>
-        ChemLearn is a modern, student-centered learning platform designed to help
-        learners master Organic Chemistry through clear explanations, structured lessons,
-        interactive tools, and guided practice. Whether you're a college student, an
-        educator, or a professional refreshing your knowledge, ChemLearn provides the
-        clarity and structure needed to succeed in one of chemistry’s most challenging
-        subjects.
+      <p className="about-intro">
+        OrgoMastery is a modern learning platform designed to help students
+        master Organic Chemistry through structured lectures, guided practice,
+        and interactive assessments. The platform organizes complex topics into
+        clear lessons supported by lecture videos, detailed notes, and quizzes
+        that reinforce conceptual understanding.
       </p>
 
-      <h2 style={{ marginTop: "2rem", marginBottom: "0.75rem", fontSize: "1.5rem" }}>
-        Our Mission
-      </h2>
-      <p style={{ lineHeight: "1.7", marginBottom: "1.5rem" }}>
-        Our mission is simple: to make Organic Chemistry accessible, intuitive, and
-        engaging. We believe that learners thrive when complex concepts are broken down
-        into meaningful patterns, supported by visual explanations, practice questions,
-        and real-world applications.
+      <h2 className="about-heading">Our Mission</h2>
+
+      <p className="about-text">
+        Organic Chemistry is often considered one of the most challenging
+        courses for science students. OrgoMastery aims to make the subject more
+        approachable by organizing concepts into logical patterns, providing
+        structured learning resources, and giving students opportunities to
+        test their understanding through practice quizzes and feedback.
       </p>
 
-      <h2 style={{ marginTop: "2rem", marginBottom: "0.75rem", fontSize: "1.5rem" }}>
-        What ChemLearn Offers
-      </h2>
+      <h2 className="about-heading">What OrgoMastery Offers</h2>
 
-      <ul style={{ marginLeft: "1.25rem", lineHeight: "1.8", fontSize: "1.05rem" }}>
-        <li><strong>Structured Lectures:</strong> Topic-based lectures that build conceptual understanding step-by-step.</li>
-        <li><strong>Interactive Quizzes:</strong> Practice questions designed to reinforce learning and build confidence.</li>
-        <li><strong>Lecture Notes:</strong> Comprehensive, easy-to-review notes tied directly to each lecture topic.</li>
-        <li><strong>Dashboard Tracking:</strong> Tools to monitor your progress, track completed lessons, and plan your next steps.</li>
-        <li><strong>Real-World Examples:</strong> Mechanisms and reactions connected to real organic synthesis and modern research.</li>
+      <ul className="about-list">
+        <li>
+          <strong>Structured Lectures:</strong> Topic-based lectures that guide
+          students step-by-step through core Organic Chemistry concepts.
+        </li>
+
+        <li>
+          <strong>Lecture Videos:</strong> Embedded video explanations that
+          visually walk through reactions, mechanisms, and problem-solving
+          strategies.
+        </li>
+
+        <li>
+          <strong>Lecture Notes:</strong> Organized notes and solution keys that
+          allow students to review material and reinforce learning outside the
+          classroom.
+        </li>
+
+        <li>
+          <strong>Interactive Quizzes:</strong> Practice quizzes that allow
+          students to test their knowledge and immediately review incorrect
+          answers.
+        </li>
+
+        <li>
+          <strong>Progress Tracking:</strong> A dashboard that helps students
+          monitor activity, track quiz attempts, and follow their learning
+          progress.
+        </li>
+
+        <li>
+          <strong>Instructor Tools:</strong> Built-in tools that allow
+          instructors to manage lectures, upload videos and notes, create
+          quizzes, and analyze student performance.
+        </li>
       </ul>
 
-      <h2 style={{ marginTop: "2rem", marginBottom: "0.75rem", fontSize: "1.5rem" }}>
-        Why ChemLearn?
-      </h2>
-      <p style={{ lineHeight: "1.7", marginBottom: "1rem" }}>
-        Organic Chemistry can feel overwhelming, but it doesn’t have to be. ChemLearn
-        removes unnecessary confusion by presenting the subject the way experts
-        understand it: through relationships, patterns, and predictable logic.
+      <h2 className="about-heading">Built for Learning</h2>
+
+      <p className="about-text">
+        OrgoMastery combines effective teaching strategies with modern web
+        technology. By integrating structured course content, practice
+        assessments, and progress tracking, the platform supports both
+        independent study and instructor-led learning environments.
       </p>
 
-      <p style={{ lineHeight: "1.7" }}>
-        Whether you're preparing for an exam, strengthening foundational knowledge, or
-        seeking a clearer learning structure, ChemLearn is here to support your journey.
+      <p className="about-text">
+        Whether you are preparing for exams, reviewing fundamental concepts, or
+        strengthening your understanding of reaction mechanisms, OrgoMastery
+        provides a clear path to mastering Organic Chemistry.
       </p>
     </section>
   );

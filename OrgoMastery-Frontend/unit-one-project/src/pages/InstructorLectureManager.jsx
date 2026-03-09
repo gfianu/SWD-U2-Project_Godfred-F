@@ -21,6 +21,11 @@ const initialNoteForm = {
   orderIndex: "",
 };
 
+const initialQuizForm = {
+  title: "",
+  description: "",
+};
+
 export default function InstructorLectureManager() {
   const { token } = useAuth();
 
@@ -36,6 +41,9 @@ export default function InstructorLectureManager() {
 
   const [noteForm, setNoteForm] = useState(initialNoteForm);
   const [editingNoteId, setEditingNoteId] = useState("");
+
+  const [quizForm, setQuizForm] = useState(initialQuizForm);
+  const [editingQuizId, setEditingQuizId] = useState("");
 
   const [loadingLectures, setLoadingLectures] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -55,6 +63,7 @@ export default function InstructorLectureManager() {
       setSelectedLectureDetail(null);
       resetVideoForm();
       resetNoteForm();
+      resetQuizForm();
     }
   }, [selectedLectureId]);
 
@@ -120,6 +129,11 @@ export default function InstructorLectureManager() {
     setEditingNoteId("");
   }
 
+  function resetQuizForm() {
+    setQuizForm(initialQuizForm);
+    setEditingQuizId("");
+  }
+
   function handleLectureFormChange(e) {
     const { name, value } = e.target;
     setLectureForm((prev) => ({ ...prev, [name]: value }));
@@ -133,6 +147,11 @@ export default function InstructorLectureManager() {
   function handleNoteFormChange(e) {
     const { name, value } = e.target;
     setNoteForm((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function handleQuizFormChange(e) {
+    const { name, value } = e.target;
+    setQuizForm((prev) => ({ ...prev, [name]: value }));
   }
 
   async function handleCreateLecture(e) {
@@ -527,11 +546,139 @@ export default function InstructorLectureManager() {
     }
   }
 
+  async function handleCreateQuiz(e) {
+    e.preventDefault();
+    if (!selectedLectureId) {
+      setError("Please select a lecture first.");
+      return;
+    }
+
+    clearMessages();
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetch(`${API_BASE_URL}/api/quizzes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          lectureId: Number(selectedLectureId),
+          title: quizForm.title,
+          description: quizForm.description,
+        }),
+      });
+
+      const data = await safeReadJson(res);
+
+      if (!res.ok) {
+        throw new Error(
+          typeof data === "string" ? data : data?.message || "Failed to create quiz"
+        );
+      }
+
+      await loadLectureDetail(selectedLectureId);
+      setMessage(`Quiz created successfully: ${data.title}`);
+      resetQuizForm();
+    } catch (err) {
+      setError(err.message || "Failed to create quiz.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function startEditQuiz(quiz) {
+    clearMessages();
+    setEditingQuizId(String(quiz.id));
+    setQuizForm({
+      title: quiz.title ?? "",
+      description: quiz.description ?? "",
+    });
+  }
+
+  async function handleUpdateQuiz(e) {
+    e.preventDefault();
+    if (!editingQuizId) return;
+
+    clearMessages();
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetch(`${API_BASE_URL}/api/quizzes/${editingQuizId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: quizForm.title,
+          description: quizForm.description,
+        }),
+      });
+
+      const data = await safeReadJson(res);
+
+      if (!res.ok) {
+        throw new Error(
+          typeof data === "string" ? data : data?.message || "Failed to update quiz"
+        );
+      }
+
+      await loadLectureDetail(selectedLectureId);
+      setMessage(`Quiz updated successfully: ${data.title}`);
+      resetQuizForm();
+    } catch (err) {
+      setError(err.message || "Failed to update quiz.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleDeleteQuiz(quizId) {
+    const confirmed = window.confirm("Delete this quiz?");
+    if (!confirmed) return;
+
+    clearMessages();
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetch(`${API_BASE_URL}/api/quizzes/${quizId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok && res.status !== 204) {
+        const data = await safeReadJson(res);
+        throw new Error(
+          typeof data === "string" ? data : data?.message || "Failed to delete quiz"
+        );
+      }
+
+      await loadLectureDetail(selectedLectureId);
+
+      if (String(editingQuizId) === String(quizId)) {
+        resetQuizForm();
+      }
+
+      setMessage("Quiz deleted successfully.");
+    } catch (err) {
+      setError(err.message || "Failed to delete quiz.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <section className="ilm-page container">
       <h2>Lecture Management</h2>
       <p className="ilm-subtitle">
-        Create lectures and manage their videos and notes.
+        Create lectures and manage their videos, notes, and quizzes.
       </p>
 
       {message && <p className="ilm-message success">{message}</p>}
@@ -829,6 +976,85 @@ export default function InstructorLectureManager() {
                       </button>
                       {editingNoteId && (
                         <button type="button" onClick={resetNoteForm}>
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                </div>
+
+                <div className="ilm-subpanel">
+                  <div className="ilm-panel-header">
+                    <h4>Quizzes</h4>
+                    <button type="button" onClick={resetQuizForm}>
+                      New Quiz
+                    </button>
+                  </div>
+
+                  {selectedLectureDetail.quizzes?.length ? (
+                    <ul className="ilm-list">
+                      {selectedLectureDetail.quizzes.map((quiz) => (
+                        <li key={quiz.id} className="ilm-list-item">
+                          <div className="ilm-list-main">
+                            <strong>{quiz.title}</strong>
+                            <span>{quiz.description || "No description"}</span>
+                            <span>Quiz ID: {quiz.id}</span>
+                          </div>
+
+                          <div className="ilm-item-actions">
+                            <button type="button" onClick={() => startEditQuiz(quiz)}>
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              className="danger"
+                              onClick={() => handleDeleteQuiz(quiz.id)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="muted">No quizzes yet.</p>
+                  )}
+
+                  <form
+                    className="ilm-form"
+                    onSubmit={editingQuizId ? handleUpdateQuiz : handleCreateQuiz}
+                  >
+                    <h5>{editingQuizId ? "Edit Quiz" : "Add Quiz"}</h5>
+
+                    <div className="ilm-field">
+                      <label htmlFor="quizTitle">Title</label>
+                      <input
+                        id="quizTitle"
+                        type="text"
+                        name="title"
+                        value={quizForm.title}
+                        onChange={handleQuizFormChange}
+                        required
+                      />
+                    </div>
+
+                    <div className="ilm-field">
+                      <label htmlFor="quizDescription">Description</label>
+                      <input
+                        id="quizDescription"
+                        type="text"
+                        name="description"
+                        value={quizForm.description}
+                        onChange={handleQuizFormChange}
+                      />
+                    </div>
+
+                    <div className="ilm-form-actions">
+                      <button type="submit" disabled={submitting}>
+                        {editingQuizId ? "Update Quiz" : "Add Quiz"}
+                      </button>
+                      {editingQuizId && (
+                        <button type="button" onClick={resetQuizForm}>
                           Cancel
                         </button>
                       )}
