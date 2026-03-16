@@ -109,10 +109,9 @@ export default function InstructorDashboard() {
             padding: "1.25rem",
           }}
         >
-          <h3 style={{ marginBottom: "0.75rem" }}>Suggested Next Build</h3>
+          <h3 style={{ marginBottom: "0.75rem" }}>Future Build</h3>
           <p style={{ color: "#555", marginBottom: "0.75rem" }}>
-            The fastest next milestone is question management, because your
-            backend CRUD endpoints already exist.
+            Some features I am planning for the next build:
           </p>
           <ol style={{ paddingLeft: "1.25rem", color: "#555", margin: 0 }}>
             <li>Create a page to list questions by quiz</li>
