@@ -97,7 +97,7 @@ This project combines my experience as a **college organic chemistry professor**
 
 <details>
     <summary>About & Location Pages</summary>
-    <img src="preview/about-page.png" alt="Screenshot of About Page view" height="500px" />
+    <img src="preview/about-page.png" alt="Screenshot of About Page view" height="300px" />
     <img src="preview/location-page.png" alt="Screenshot of Location Page" height="500px" />
 </details>
 
