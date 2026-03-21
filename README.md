@@ -210,7 +210,6 @@ This full-stack project leverages a modern, decoupled MVC architecture with mult
         spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
         app.jwt.secret=your-secret-key
     ```
-1.  **Seed database with data:** Import [these CSV files](https://github.com/Carolista/swd-unit2-java-art-gallery-project/tree/main/test-data/part5-and-part6-data) into the database, in the following order: `artists.csv`, `categories.csv`, `details.csv`, `artworks.csv`, `artwork_categories.csv`
 
 1.  **Run the Java/Spring Boot application:** If you do not have the application loaded in an IDE such as IntelliJ, go to the terminal and navigate to the root directory of the backend project. Then execute the following command to build and run the application (Hibernate will automatically create the tables): 
     ```shell
@@ -218,26 +217,13 @@ This full-stack project leverages a modern, decoupled MVC architecture with mult
     ```
     
     🟢 The API should now be running on `http://localhost:8080`.
-
-1.  **Register an admin user:** Using a tool such as Postman, make a `POST` request to `http://localhost:8080/api/user/register` with a JSON body structured as follows:
-    ```json
-    {
-        "name": "John Smith",
-        "email": "john@smith.com",
-        "password": "abcd1234"
-    }
-    ```
-
-> [!WARNING]
-> If you get an `UnsupportedClassVersionError`, you may need to set your `JAVA_HOME` environment variable to point to a Java 21 JDK installation. If you are running the application from an IDE (like IntelliJ or VS Code), you will also need to ensure the project's SDK and language level settings within the IDE are configured to use a Java 21 JDK.
-
 ---
 
 ### Front End Setup (React/Vite)
 
 1.  **Navigate to the front end project directory:** 
     ```shell
-    cd ../art-gallery-frontend
+    cd ../OrgoMastery-Frontend
     ```
 
 1.  **Install dependencies:** 
@@ -261,11 +247,19 @@ This full-stack project leverages a modern, decoupled MVC architecture with mult
 <a name="database"></a>
 ## 🗄️ Database Structure (ERD)
 
-This project utilizes a MySQL database structured around four core entities, managed by Hibernate with the following relationships:
+The database is centered around:
 
-1.  **Artwork** ↔️ **Details**: One-to-One
-2.  **Artwork** ↔️ **Artist**: Many-to-One
-3.  **Artwork** ↔️ **Category**: Many-to-Many
+1. Users (roles: STUDENT, INSTRUCTOR, ADMIN)
+2. Lectures
+3. Videos & Notes
+4. Quizzes & Questions
+5. Quiz Attempts
+6. Comments
+### Key Relationships:
+1. Lecture → Videos, Notes, Quizzes
+2. Quiz → Questions
+3. User → Attempts
+4. Attempt → Answers
 
 ### Entity Relationship Diagram (ERD)
 <details open>
