@@ -1,8 +1,5 @@
 <div align="center">
 <img src="preview/orgomastery-logo.png" alt="OrgoMastery logo" width="50%" />
-</div>
-
-<div align="center">
 <h1>OrgoMastery: Full-Stack Learning Platform</h1>
 </div>
 
