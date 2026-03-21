@@ -124,8 +124,8 @@ This project combines my experience as a **college organic chemistry professor**
 </details>
 
 <details>
-    <summary>Admin Forms</summary>
-    <img src="preview/add-artwork-form.png" alt="Screenshot of Add Artwork Form view" width="700px" />
+    <summary>Student Dashboard</summary>
+    <img src="preview/student-dashboard.png" alt="Screenshot of Student Dashboard" width="700px" />
     <img src="preview/add-artist-form.png" alt="Screenshot of Add Artist Form view" width="700px" />
     <img src="preview/add-category-form.png" alt="Screenshot of Add Category Form view" width="700px" />
 </details>
