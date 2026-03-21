@@ -49,18 +49,26 @@ This project combines my experience as a **college organic chemistry professor**
 ---
 
 <a name="features"></a>
-## 🎨 Features
+## 🎯 Features
 
-### Public-Facing Site
-- **Art Gallery View:** Displays all artworks currently on display
-- **Dynamic Details Pages:** Each artwork links to a dynamic page showing a full-size image and details (artist, categories, description, etc.)
-- **Responsive Design:** Fully functional across multiple breakpoints for desktop, tablet, and mobile devices
-- **Accessibility:** UI elements adhere to basic accessibility standards (semantic HTML, image alt text, etc.)
+### 👨‍🎓 Student Features
+- View structured lecture content (videos, notes, quizzes)
+- Take interactive quizzes with instant feedback
+- Track quiz performance and progress
+- Participate in discussion via comments
 
-### Admin Portal (Secure)
-- **Authentication:** Secure login/logout using token-based Spring Security
-- **Authorization:** Admin has access to entire website
-- **CRUD Operations:** Admin can view, add, and delete database records (artworks, artists, and categories)
+### 👨‍🏫 Instructor Features
+- Create, update, and delete lectures
+- Manage lecture videos and notes
+- Create quizzes and questions
+- View quiz analytics and student performance
+
+### 🔐 Authentication & Security
+- JWT-based authentication
+- Role-based access control:
+  - STUDENT
+  - INSTRUCTOR
+  - ADMIN
 
 ---
 
