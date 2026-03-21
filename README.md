@@ -284,14 +284,13 @@ The database is centered around:
 | 🔵 `PUT` | `/api/lectures/{id}` | Update lecture by id |
 | 🔴 `DELETE` | `/api/lectures/{id}` | Delete lecture by id |
 
-### Authentication 🔐
-| HTTP Method | Endpoint | Description | Access |
-| :--- | :--- | :--- | :--- |
-| 🟡 `POST` | `/api/user/login` | Authenticate and receive a JWT | 🌎 Public |
-| 🟡 `POST` | `/api/user/logout` | Invalidate the current session token (tracked server-side) | 🌎 Public |
-| 🟡 `POST` | `/api/user/validate-token` | Check if a token is currently valid | 🌎 Public |
+### Quizzes 📝
+| HTTP Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| 🟢 `GET` | `/api/quizzes/{id}` | Get quiz by id |
+| 🟡 `POST` | `/api/quizzes/{id}/attempts` | Submit quiz |
+| 🟢 `GET` | `/api/quizzes/{id}/analytics` | Get quiz analytics |
 
-<!-- | 🟡 `POST` | `/api/user/register` | Register a new user (for initial setup/testing) | 🌎 Public | -->
 ---
 
 <a name="future"></a>
