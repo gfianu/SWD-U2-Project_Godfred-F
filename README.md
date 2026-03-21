@@ -1,4 +1,4 @@
-<img src="preview/orgomastery-logo.png" alt="OrgoMastery logo" width="70%" />
+<img src="preview/orgomastery-logo.png" alt="OrgoMastery logo" width="55%" />
 <img src="preview/mag-lobby.png" alt="Image of Midtown Art Gallery lobby" width="100%" />
 
 <div align="center">
