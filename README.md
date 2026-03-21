@@ -91,7 +91,7 @@ This project combines my experience as a **college organic chemistry professor**
 
 <details open>
     <summary>Home & Login Pages</summary>
-    <img src="preview/orgomastery-homepage.png" alt="Screenshot of Public Home Page view" height="500px" />
+    <img src="preview/orgomastery-homepage.png" alt="Screenshot of Public Home Page view" height="300px" />
     <img src="preview/orgomastery-login.png" alt="Screenshot of Login Page view" height="500px" />
 </details>
 
