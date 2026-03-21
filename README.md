@@ -1,5 +1,6 @@
+<div align="center">
 <img src="preview/orgomastery-logo.png" alt="OrgoMastery logo" width="50%" />
-<img src="preview/mag-lobby.png" alt="Image of Midtown Art Gallery lobby" width="100%" />
+</div>
 
 <div align="center">
   <h1>Midtown Art Gallery: Full-Stack Web Application</h1>
