@@ -92,14 +92,14 @@ This project combines my experience as a **college organic chemistry professor**
 <details open>
     <summary>Home, Register & Login Pages</summary>
     <img src="preview/orgomastery-homepage.png" alt="Screenshot of Public Home Page view" height="400px" />
-    <img src="preview/orgomastery-register.png" alt="Screenshot of Public Home Page view" height="500px" />
+    <img src="preview/orgomastery-register.png" alt="Screenshot of Register Page view" height="500px" />
     <img src="preview/orgomastery-login.png" alt="Screenshot of Login Page view" height="500px" />
 </details>
 
 <details>
-    <summary>About & Location Pages</summary>
-    <img src="preview/about-page.png" alt="Screenshot of About Page view" height="300px" />
-    <img src="preview/location-page.png" alt="Screenshot of Location Page" height="500px" />
+    <summary>About & Contact Pages</summary>
+    <img src="preview/orgomastery-about.png" alt="Screenshot of About Page view" height="500px" />
+    <img src="preview/orgomastery-contact.png" alt="Screenshot of Contact Page" height="500px" />
 </details>
 
 <details>
