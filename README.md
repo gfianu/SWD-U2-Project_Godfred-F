@@ -34,6 +34,7 @@
     <a href="#installation">Installation</a> •
     <a href="#database">Database</a> •
     <a href="#api">API</a> •
+    <a href="#testing">Testing & Debugging</a> •
     <a href="#future">Future Features</a>
 </div>
 
@@ -293,32 +294,35 @@ The database is centered around:
 
 ---
 
+<a name="testing"></a>
+## 🧪 Testing & Debugging
+
+Key debugging efforts included:
+
+- Resolving **403 Forbidden errors** due to Spring Security misconfiguration
+- Fixing **role-based authorization flaws**
+- Debugging **frontend/backend API mismatches**
+- Managing **React state updates after CRUD operations**
+- Resetting and reseeding the database during schema changes
+  
+---
+
 <a name="future"></a>
 ## 🔮 Future Features
 
-Several features have been scoped out for future development to expand the application's functionality.
-
-### Improve Fetching
-- Refactor React app to utilize `use()` in conjunction with `<Suspense />` to simplify promise handling & loading state
-- Use Axios for all HTTP requests, not just auth
-
-### Improve CRUD
-- Enable Admin to delete categories
-- Enable Admin to edit categories, artists, and artworks
-
-### Gallery Events
-- Implement dedicated **Events** entity and full CRUD functionality for events
-- Add a public-facing `/events` route to display upcoming gallery events
-- Add a registration form to UI to collect ticket reservations for an event
-- Provide for event data management in the admin portal
-
-### Advanced Search, Sort & Filtering
-- Implement dynamic filtering and sorting on the public gallery page (by Category, Artist name, or Artwork title)
-- Implement dynamic sorting on the public events page (by date, title, type, or host)
-- Add a full-text search bar on both artworks and events pages
+- AI-powered question generation
+- Advanced quiz analytics dashboard
+- Comment moderation system
+- Improved progress tracking
+- Instructor-specific course ownership
+- Deployment (Render / AWS / Netlify full-stack)
 
 ---
 
 ## 🧑‍💻 Designer & Author
 
-Caroline Jones - [@Carolista](https://github.com/Carolista) - [CodeWithCarrie.com](http://codewithcarrie.com) - [LinkedIn](https://www.linkedin.com/in/carolinerjones)
+Developed by a college organic chemistry professor transitioning into software engineering.
+
+This project reflects the intersection of education, data modeling, and full-stack development.
+
+Godfred Fianu - [@gfianu](https://github.com/gfianu) - [Professional Page](http://gfianu.github.io) - [LinkedIn](https://www.https://www.linkedin.com/in/godfred-fianu-phd-8479b727/)
