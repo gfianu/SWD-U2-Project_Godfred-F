@@ -175,25 +175,23 @@ This full-stack project leverages a modern, decoupled MVC architecture with mult
 
 1.  **Clone the repository:** In the terminal, navigate to the directory where you want the project to live, then execute the following commands:
     ```shell
-    git clone https://https://github.com/gfianu/SWD-U2-Project_Godfred-F.git  # or your link, if forked
+    git clone https://github.com/gfianu/SWD-U2-Project_Godfred-F.git  # or your link, if forked
     cd OrgoMastery-Backend
     ```
 
-1.  **Configure secrets for database and JWTs:** Create a new MySQL database named `gallery_db`, then create an `.env` file at the project root directory (`art-gallery-backend`): 
+1.  **Configure secrets for database and JWTs:** Create a new MySQL database named `orgo_mastery`, then create an `app.env` file at the project root directory (`OrgoMastery-Backend`): 
     ```properties
     # Location of your local database server
     DB_HOST=localhost
     DB_PORT=3306
     
     # Database name
-    DB_NAME_PART_6=gallery_db
+    DB_NAME=orgo_mastery
     
     # Credentials
-    DB_USER=root
+    DB_USER=orgo_mastery
     DB_PASS=[your_password]
     
-    # Auth
-    JWT_SECRET=artgallery
     ```
 
 1.  **Seed database with data:** Import [these CSV files](https://github.com/Carolista/swd-unit2-java-art-gallery-project/tree/main/test-data/part5-and-part6-data) into the database, in the following order: `artists.csv`, `categories.csv`, `details.csv`, `artworks.csv`, `artwork_categories.csv`
