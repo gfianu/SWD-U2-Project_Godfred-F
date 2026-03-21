@@ -146,10 +146,6 @@ This full-stack project leverages a modern, decoupled MVC architecture with mult
 | ![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white) | Declarative, component-based navigation and routing |
 | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white) | Quick cold start and near-instantaneous Hot Module Replacement (HMR) |
 | ![CSS](https://img.shields.io/badge/CSS-rebeccapurple?style=for-the-badge&logo=css&logoColor=white) | Styling, layout, responsiveness, and accessibility improvements |
-| ![Google Fonts](https://img.shields.io/badge/Google_Fonts-EA4335?style=for-the-badge&logo=googlefonts&logoColor=white) | A vast library of open-source fonts, making high-quality typography easily accessible across the web |
-| ![Font Awesome](https://img.shields.io/badge/Font_Awesome-0A6EB4?style=for-the-badge&logo=fontawesome&logoColor=white) | Scalable vector icons that can be customized with CSS |
-| ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=333333) | Consistent, opinionated code formatting for readability and a unified codebase |
-| ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white) | Higher code quality and maintainability due to identification of potential errors & anti-patterns |
 
 ### Back End & Database
 | Technology | Description |
