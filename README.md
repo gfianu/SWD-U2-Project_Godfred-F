@@ -78,7 +78,7 @@ This project combines my experience as a **college organic chemistry professor**
 ### Wireframes w/Site Map
 
 <details open>
-  <summary>Click here to toggle view of wireframes.</summary>
+  <summary>Click here to view wireframes.</summary>
   <img src="preview/wireframe-sample.png" height="500px" />
   <p><a href="preview/orgomastery-wireframes.pdf">View full PDF</a></p>
 </details>
