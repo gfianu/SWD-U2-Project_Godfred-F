@@ -276,12 +276,13 @@ The database is centered around:
 | 🟡 `POST` | `/api/auth/login` | Login |
 | 🟢 `GET` | `/api/auth/me` | Get current user |
 
-### Categories 🏷️
-| HTTP Method | Endpoint | Description | Access |
-| :--- | :--- | :--- | :--- |
-| 🟢 `GET` | `/api/categories` | Retrieve a list of all categories | 🌎 Public |
-| 🟢 `GET` | `/api/categories/details/:id` | Retrieve detailed record for a single category | 🌎 Public |
-| 🟡 `POST` | `/api/categories/add` | Create a new category record | 🔰 Admin |
+### Lectures 👨‍🏫
+| HTTP Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| 🟢 `GET` | `/api/lectures` | Get lectures |
+| 🟡 `POST` | `/api/lectures` | Create lectures |
+| 🔵 `PUT` | `/api/lectures/{id}` | Update lecture by id |
+| 🔴 `DELETE` | `/api/lectures/{id}` | Delete lecture by id |
 
 ### Authentication 🔐
 | HTTP Method | Endpoint | Description | Access |
