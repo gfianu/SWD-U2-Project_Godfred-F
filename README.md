@@ -42,12 +42,9 @@
 <a name="about"></a>
 ## 💡 About the Project
 
-This is a **full-stack project** that I designed originally as a teaching tool for my students at [LaunchCode](http://www.launchcode.org). As a web application, it has two primary uses: as a publicly accessible site for the fictitious Midtown Art Gallery and as a secure administrative portal for data management. The application provides a responsive, accessible interface built with modern ReactJS components, while all data persistence and security are handled by a robust Java Spring Boot backend and a MySQL relational database.
+**OrgoMastery** is a full-stack educational web application designed to help students master Organic Chemistry through structured lectures, interactive quizzes, and progress tracking. The platform provides a clean, intuitive interface for learners while offering instructors powerful tools to create and manage course content.
 
-The `main` branch contains a more advanced version of the project that I am building and maintaining as part of my portfolio, while the other branches are for the use of students working through different phases of the project they watch me build during class.
-
-> [!IMPORTANT]
-> Students who are using this project as a learning tool should read the [instructions](docs/INSTRUCTIONS.md) for creating and building this project.
+This project combines my experience as a **college organic chemistry professor** with modern software engineering practices, demonstrating how domain expertise can be translated into scalable, user-centered applications.
 
 ---
 
