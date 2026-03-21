@@ -269,23 +269,12 @@ The database is centered around:
 <a name="api"></a>
 ## ⚙️ API Endpoints
 
-The following RESTful endpoints manage data access and authentication. **Note:** All `POST` and `DEL` endpoints (except `register` and `login`) require a valid JWT in the Authorization header.
-
-### Artworks 🖼️
-| HTTP Method | Endpoint | Description | Access |
-| :--- | :--- | :--- | :--- |
-| 🟢 `GET` | `/api/artworks` | Retrieve a list of all artworks | 🌎 Public |
-| 🟢 `GET` | `/api/artworks/details/:id` | Retrieve detailed record for a single artwork | 🌎 Public |
-| 🟡 `POST` | `/api/artworks/add` | Create a new artwork record | 🔰 Admin |
-| 🔴 `DEL` | `/api/artworks/delete/:id` | Delete an artwork by ID | 🔰 Admin |
-
-### Artists 🎨
-| HTTP Method | Endpoint | Description | Access |
-| :--- | :--- | :--- | :--- |
-| 🟢 `GET` | `/api/artists` | Retrieve a list of all artists | 🌎 Public |
-| 🟢 `GET` | `/api/artists/details/:id` | Retrieve detailed record for a single artist | 🌎 Public |
-| 🟡 `POST` | `/api/artists/add` | Create a new artist record | 🔰 Admin |
-| 🔴 `DEL` | `/api/artists/delete/:id` | Delete an artist by ID | 🔰 Admin |
+### Authentication 🔐
+| HTTP Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| 🟡 `POST` | `/api/auth/register` | Register user |
+| 🟡 `POST` | `/api/auth/login` | Login |
+| 🟢 `GET` | `/api/auth/me` | Get current user |
 
 ### Categories 🏷️
 | HTTP Method | Endpoint | Description | Access |
