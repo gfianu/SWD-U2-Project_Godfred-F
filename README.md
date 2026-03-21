@@ -321,8 +321,4 @@ Key debugging efforts included:
 
 ## 🧑‍💻 Designer & Author
 
-Developed by a college organic chemistry professor transitioning into software engineering.
-
-This project reflects the intersection of education, data modeling, and full-stack development.
-
 Godfred Fianu - [GitHub](https://github.com/gfianu) - [Professional Portfolio](http://gfianu.github.io) - [LinkedIn](https://www.linkedin.com/in/godfred-fianu-phd-8479b727/)
