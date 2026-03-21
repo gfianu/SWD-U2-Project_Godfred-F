@@ -109,11 +109,11 @@ This project combines my experience as a **college organic chemistry professor**
     <img src="preview/orgomastery-notes.png" alt="Screenshot of Lecture Notes Page" width="700px" />
 </details>
 
-#### ADMIN PORTAL
+#### USER PORTAL
 
 <details>
-    <summary>Admin Home</summary>
-    <img src="preview/admin-home-page.png" alt="Screenshot of Admin Home Page view" height="500px" />
+    <summary>Admin Dashboard</summary>
+    <img src="preview/admin-user-management.png" alt="Screenshot of Admin User Management Page view" height="500px" />
 </details>
 <details>
     <summary>Admin Tables</summary>
