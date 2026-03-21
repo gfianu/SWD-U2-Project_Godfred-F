@@ -165,7 +165,7 @@ This full-stack project leverages a modern, decoupled MVC architecture with mult
 > [!NOTE]
 > To run this project locally, you will need the following installed:
 > - Node.js (LTS version)
-> - npm or yarn
+> - npm
 > - Java Development Kit (JDK) 21
 > - MySQL Server (version 8.0+)
 
@@ -175,8 +175,8 @@ This full-stack project leverages a modern, decoupled MVC architecture with mult
 
 1.  **Clone the repository:** In the terminal, navigate to the directory where you want the project to live, then execute the following commands:
     ```shell
-    git clone https://github.com/Carolista/swd-unit2-java-art-gallery-project  # or your link, if forked
-    cd swd-unit2-java-art-gallery-project/art-gallery-backend
+    git clone https://https://github.com/gfianu/SWD-U2-Project_Godfred-F.git  # or your link, if forked
+    cd OrgoMastery-Backend
     ```
 
 1.  **Configure secrets for database and JWTs:** Create a new MySQL database named `gallery_db`, then create an `.env` file at the project root directory (`art-gallery-backend`): 
