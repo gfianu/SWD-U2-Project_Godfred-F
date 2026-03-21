@@ -325,4 +325,4 @@ Developed by a college organic chemistry professor transitioning into software e
 
 This project reflects the intersection of education, data modeling, and full-stack development.
 
-Godfred Fianu - [@gfianu](https://github.com/gfianu) - [Professional Page](http://gfianu.github.io) - [LinkedIn](https://www.https://www.linkedin.com/in/godfred-fianu-phd)
+Godfred Fianu - [@gfianu](https://github.com/gfianu) - [Professional Page](http://gfianu.github.io) - [LinkedIn](https://www.linkedin.com/in/godfred-fianu-phd)
