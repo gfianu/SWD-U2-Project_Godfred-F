@@ -103,9 +103,10 @@ This project combines my experience as a **college organic chemistry professor**
 </details>
 
 <details>
-    <summary>Artwork Gallery & Details Pages</summary>
-    <img src="preview/artwork-gallery.png" alt="Screenshot of Artwork Gallery view" width="700px" />
-    <img src="preview/artwork-details.png" alt="Screenshot of Artwork Details Page view" width="700px" />
+    <summary>Lecture, Videos & Notes Pages</summary>
+    <img src="preview/orgomastery-lecturelist.png" alt="Screenshot of Lecture List Page" width="500px" />
+    <img src="preview/orgomastery-lecturevideo.png" alt="Screenshot of Lecture Video Page" width="500px" />  
+    <img src="preview/orgomastery-notes.png" alt="Screenshot of Lecture Notes Page" width="500px" />
 </details>
 
 #### ADMIN PORTAL
