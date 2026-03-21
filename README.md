@@ -116,10 +116,10 @@ This project combines my experience as a **college organic chemistry professor**
     <img src="preview/admin-user-management.png" alt="Screenshot of Admin User Management Page view" height="500px" />
 </details>
 <details>
-    <summary>Admin Tables</summary>
-    <img src="preview/artworks-table.png" alt="Screenshot of Artworks Table view" height="500px" />
-    <img src="preview/artists-table.png" alt="Screenshot of Artists Table view" height="500px" />
-    <img src="preview/categories-table.png" alt="Screenshot of Categories Table view" height="500px" />
+    <summary>Instructor Dashboard</summary>
+    <img src="preview/instructor-dashboard.png" alt="Screenshot of Instructor Dashboard" height="500px" />
+    <img src="preview/lecture-management.png" alt="Screenshot of Lecture Management view" height="500px" />
+    <img src="preview/quiz-management.png" alt="Screenshot of Quiz Management" height="500px" />
 </details>
 
 <details>
