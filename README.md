@@ -120,6 +120,7 @@ This project combines my experience as a **college organic chemistry professor**
     <img src="preview/instructor-dashboard.png" alt="Screenshot of Instructor Dashboard" height="500px" />
     <img src="preview/lecture-management.png" alt="Screenshot of Lecture Management view" height="500px" />
     <img src="preview/quiz-management.png" alt="Screenshot of Quiz Management" height="500px" />
+    <img src="preview/instructor quiz analytics.png" alt="Screenshot of Quiz Analytics" height="500px" />
 </details>
 
 <details>
