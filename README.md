@@ -193,6 +193,27 @@ This full-stack project leverages a modern, decoupled MVC architecture with mult
     DB_PASS=[your_password]
     
     ```
+    Configure `application.properties`:
+        ```properties
+        spring.application.name=orgomastery
+        spring.config.import=optional:file:app.env[.properties]
+
+        # Database connection settings
+        spring.datasource.url=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false
+        spring.datasource.username=${DB_USER}
+        spring.datasource.password=${DB_PASS}
+        spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+        # Hibernate
+        spring.jpa.hibernate.ddl-auto=update
+        spring.jpa.show-sql=true
+        spring.jpa.properties.hibernate.format_sql=true
+        spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+
+        app.jwt.secret=your-secret-key
+        app.jwt.expiration-ms=
+    
+    ```
 
 1.  **Seed database with data:** Import [these CSV files](https://github.com/Carolista/swd-unit2-java-art-gallery-project/tree/main/test-data/part5-and-part6-data) into the database, in the following order: `artists.csv`, `categories.csv`, `details.csv`, `artworks.csv`, `artwork_categories.csv`
 
