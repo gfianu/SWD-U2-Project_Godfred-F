@@ -229,15 +229,11 @@ This full-stack project leverages a modern, decoupled MVC architecture with mult
 1.  **Install dependencies:** 
     ```shell
     npm install
-    # or 
-    # yarn install
     ```
 
 1.  **Run the React/Vite application:** 
     ```shell
     npm run dev
-    # or
-    # yarn dev
     ```
     
     🟢 The frontend application will start and can be found in a browser, typically at `http://localhost:5173`.
@@ -264,8 +260,8 @@ The database is centered around:
 ### Entity Relationship Diagram (ERD)
 <details open>
   <summary>Click here to toggle view of ERD</summary><br />
-<em>Click on image to view in Figma.</em><br />
-<a href="https://www.figma.com/board/o34g5TcvORPtVTM2M2ONtk/ERD---Art-Gallery--Spring-"><img src="preview/erd.png" alt="Entity Relationship Diagram" /></a>
+<em>Click on image to view in Lucid.</em><br />
+<a href="https://lucid.app/lucidspark/0f2ea27d-fb56-46c6-98c8-5bdbf376abad/edit?page=0_0&invitationId=inv_05876567-491b-46c9-8c10-b02464b26735#"><img src="preview/orgomastery-ERD.png" alt="Entity Relationship Diagram" /></a>
 </details>
 
 ---
