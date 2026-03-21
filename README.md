@@ -194,7 +194,7 @@ This full-stack project leverages a modern, decoupled MVC architecture with mult
     
     ```
     Configure `application.properties`:
-   ```properties
+     ```properties
         spring.application.name=orgomastery
         spring.config.import=optional:file:app.env[.properties]
         # Database connection settings
